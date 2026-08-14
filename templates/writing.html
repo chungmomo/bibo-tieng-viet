@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Tập viết chữ - VietKid{% endblock %}
+{% block content %}
+
+<h1 class="page-title">Bé tập viết chữ ✍️</h1>
+<p class="page-subtitle">Chọn 1 chữ cái để tô theo hình mờ nhé!</p>
+
+<div class="writing-select-grid" id="writing-grid">
+  {% for item in letters %}
+  <a class="writing-select-card" href="/writing/{{ loop.index0 }}">
+    <span class="letter">{{ item.letter }}</span>
+    <span class="stars" id="wstars-{{ loop.index0 }}"></span>
+  </a>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(async function markStars() {
+  const profileId = VietKidProfile.getId();
+  if (!profileId) return;
+  try {
+    const summary = await VietKidAPI.getProgress(profileId);
+    Object.entries(summary.writing.letters).forEach(([idx, info]) => {
+      const el = document.getElementById("wstars-" + idx);
+      if (el) el.textContent = "⭐".repeat(info.stars) || "";
+    });
+  } catch (e) {}
+})();
+</script>
+{% endblock %}

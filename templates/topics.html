@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Chủ đề từ vựng - VietKid{% endblock %}
+{% block content %}
+
+<h1 class="page-title">Chọn chủ đề từ vựng 📚</h1>
+<p class="page-subtitle">Mỗi chủ đề có từ mới, thẻ ghi nhớ và trò chơi vui nhộn!</p>
+
+<div class="topic-grid">
+  {% for t in topics %}
+  <a class="topic-card" href="/topics/{{ t.id }}" style="background: {{ t.color }};">
+    <span class="icon">{{ t.icon }}</span>
+    <div class="name">{{ t.name }}</div>
+    <div class="name-ja">{{ t.name_ja }}</div>
+    <div class="mastered-tag" id="mastered-{{ t.id }}"></div>
+  </a>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(async function markMastered() {
+  const profileId = VietKidProfile.getId();
+  if (!profileId) return;
+  try {
+    const summary = await VietKidAPI.getProgress(profileId);
+    Object.entries(summary.topics).forEach(([id, info]) => {
+      const el = document.getElementById("mastered-" + id);
+      if (!el) return;
+      if (info.mastered) {
+        el.textContent = "✅ Đã giỏi!";
+      } else if (info.stars > 0) {
+        el.textContent = `⭐ ${info.stars}/${info.max_stars}`;
+      }
+    });
+  } catch (e) {}
+})();
+</script>
+{% endblock %}

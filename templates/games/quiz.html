@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Đố vui - {{ topic.name }} - VietKid{% endblock %}
+{% block content %}
+
+<h1 class="page-title">❓ Đố vui: {{ topic.name }}</h1>
+<p class="page-subtitle">Xem hình và nghĩa tiếng Nhật, chọn từ tiếng Việt đúng nhé!</p>
+
+<div class="game-header">
+  <div class="game-stat">📋 Câu: <span id="q-index">1</span> / <span id="q-total">0</span></div>
+  <div class="game-stat">✅ Đúng: <span id="q-correct">0</span></div>
+  <a class="btn btn-outline" href="/topics/{{ topic.id }}">⬅️ Quay lại</a>
+</div>
+
+<div class="quiz-prompt">
+  <div class="emoji-big" id="prompt-emoji"></div>
+  <div class="ja-text" id="prompt-ja"></div>
+  <button class="btn btn-blue" id="hint-btn" style="margin-top:14px;">🔊 Nghe gợi ý</button>
+</div>
+
+<div class="quiz-options" id="options"></div>
+
+<div id="result-modal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="big-emoji">👑</div>
+    <h2>Xong rồi!</h2>
+    <div class="stars-earned" id="stars-earned"></div>
+    <div class="score-text" id="score-text"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="retry-btn">🔄 Chơi lại</button>
+      <a class="btn btn-outline" href="/topics/{{ topic.id }}">📚 Về chủ đề</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const topicId = {{ topic.id | tojson }};
+const allWords = {{ topic.words | tojson }};
+
+let order = [], qIndex = 0, correctCount = 0, answered = false;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildOptions(correctWord) {
+  const distractors = shuffle(allWords.filter((w) => w.vi !== correctWord.vi)).slice(0, 3);
+  return shuffle([correctWord, ...distractors]);
+}
+
+function renderQuestion() {
+  answered = false;
+  const word = order[qIndex];
+  document.getElementById("q-index").textContent = qIndex + 1;
+  document.getElementById("prompt-emoji").textContent = word.emoji;
+  document.getElementById("prompt-ja").textContent = word.ja;
+  vietkidPopEmoji(document.getElementById("prompt-emoji"));
+
+  const optionsEl = document.getElementById("options");
+  optionsEl.innerHTML = "";
+  const options = buildOptions(word);
+  options.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.className = "quiz-option";
+    btn.textContent = opt.vi;
+    btn.addEventListener("click", () => onAnswer(btn, opt, word));
+    optionsEl.appendChild(btn);
+  });
+}
+
+function onAnswer(btn, opt, correctWord) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = opt.vi === correctWord.vi;
+  btn.classList.add(isCorrect ? "correct" : "incorrect");
+  if (isCorrect) {
+    correctCount++;
+    document.getElementById("q-correct").textContent = correctCount;
+    VietKidSound.playCorrect();
+  } else {
+    VietKidSound.playWrong();
+    [...document.getElementById("options").children].forEach((c) => {
+      if (c.textContent === correctWord.vi) c.classList.add("correct");
+    });
+  }
+  VietKidSpeech.speakVi(correctWord.vi);
+
+  setTimeout(() => {
+    qIndex++;
+    if (qIndex < order.length) {
+      renderQuestion();
+    } else {
+      finishGame();
+    }
+  }, 1300);
+}
+
+async function finishGame() {
+  const pct = correctCount / order.length;
+  let stars;
+  if (pct >= 0.9) stars = 3;
+  else if (pct >= 0.6) stars = 2;
+  else stars = 1;
+
+  document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+  document.getElementById("score-text").textContent = `Đúng ${correctCount}/${order.length} câu!`;
+  document.getElementById("result-modal").style.display = "flex";
+  VietKidSound.playCheer();
+  VietKidSound.confettiBurst();
+
+  const profileId = VietKidProfile.getId();
+  if (profileId) {
+    try {
+      await VietKidAPI.saveProgress({
+        profile_id: profileId,
+        topic_id: topicId,
+        game_type: "quiz",
+        score: correctCount,
+        stars: stars,
+      });
+    } catch (e) {}
+  }
+}
+
+function startGame() {
+  order = shuffle(allWords);
+  qIndex = 0; correctCount = 0;
+  document.getElementById("q-total").textContent = order.length;
+  document.getElementById("q-correct").textContent = 0;
+  document.getElementById("result-modal").style.display = "none";
+  renderQuestion();
+}
+
+document.getElementById("hint-btn").addEventListener("click", () => {
+  VietKidSpeech.speakVi(order[qIndex].vi);
+});
+document.getElementById("retry-btn").addEventListener("click", startGame);
+
+if (!VietKidProfile.getId()) {
+  window.location.href = "/?redirect=" + encodeURIComponent(window.location.pathname);
+} else {
+  startGame();
+}
+</script>
+{% endblock %}

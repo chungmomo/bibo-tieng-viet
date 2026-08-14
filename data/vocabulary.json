@@ -1,0 +1,159 @@
+[
+  {
+    "id": "gia_dinh",
+    "name": "Gia đình",
+    "name_ja": "家族",
+    "icon": "👪",
+    "color": "#FF9AA2",
+    "words": [
+      {"vi": "bố", "ja": "お父さん", "emoji": "👨"},
+      {"vi": "mẹ", "ja": "お母さん", "emoji": "👩"},
+      {"vi": "anh trai", "ja": "お兄さん", "emoji": "🧑"},
+      {"vi": "chị gái", "ja": "お姉さん", "emoji": "👧"},
+      {"vi": "em bé", "ja": "赤ちゃん", "emoji": "👶"},
+      {"vi": "ông", "ja": "おじいさん", "emoji": "👴"},
+      {"vi": "bà", "ja": "おばあさん", "emoji": "👵"},
+      {"vi": "con", "ja": "子供", "emoji": "🧒"}
+    ]
+  },
+  {
+    "id": "con_vat",
+    "name": "Con vật",
+    "name_ja": "動物",
+    "icon": "🐾",
+    "color": "#FFDAC1",
+    "words": [
+      {"vi": "mèo", "ja": "猫", "emoji": "🐱"},
+      {"vi": "chó", "ja": "犬", "emoji": "🐶"},
+      {"vi": "gà", "ja": "にわとり", "emoji": "🐔"},
+      {"vi": "vịt", "ja": "あひる", "emoji": "🦆"},
+      {"vi": "cá", "ja": "魚", "emoji": "🐟"},
+      {"vi": "voi", "ja": "ぞう", "emoji": "🐘"},
+      {"vi": "hổ", "ja": "とら", "emoji": "🐯"},
+      {"vi": "thỏ", "ja": "うさぎ", "emoji": "🐰"},
+      {"vi": "gấu", "ja": "くま", "emoji": "🐻"},
+      {"vi": "chim", "ja": "鳥", "emoji": "🐦"}
+    ]
+  },
+  {
+    "id": "mau_sac",
+    "name": "Màu sắc",
+    "name_ja": "色",
+    "icon": "🎨",
+    "color": "#B5EAD7",
+    "words": [
+      {"vi": "đỏ", "ja": "赤", "emoji": "🔴"},
+      {"vi": "vàng", "ja": "黄色", "emoji": "🟡"},
+      {"vi": "xanh lá", "ja": "緑", "emoji": "🟢"},
+      {"vi": "xanh dương", "ja": "青", "emoji": "🔵"},
+      {"vi": "hồng", "ja": "ピンク", "emoji": "🩷"},
+      {"vi": "tím", "ja": "紫", "emoji": "🟣"},
+      {"vi": "cam", "ja": "オレンジ", "emoji": "🟠"},
+      {"vi": "trắng", "ja": "白", "emoji": "⚪"},
+      {"vi": "đen", "ja": "黒", "emoji": "⚫"},
+      {"vi": "nâu", "ja": "茶色", "emoji": "🟤"}
+    ]
+  },
+  {
+    "id": "so_dem",
+    "name": "Số đếm",
+    "name_ja": "数字",
+    "icon": "🔢",
+    "color": "#C7CEEA",
+    "words": [
+      {"vi": "một", "ja": "1", "emoji": "1️⃣"},
+      {"vi": "hai", "ja": "2", "emoji": "2️⃣"},
+      {"vi": "ba", "ja": "3", "emoji": "3️⃣"},
+      {"vi": "bốn", "ja": "4", "emoji": "4️⃣"},
+      {"vi": "năm", "ja": "5", "emoji": "5️⃣"},
+      {"vi": "sáu", "ja": "6", "emoji": "6️⃣"},
+      {"vi": "bảy", "ja": "7", "emoji": "7️⃣"},
+      {"vi": "tám", "ja": "8", "emoji": "8️⃣"},
+      {"vi": "chín", "ja": "9", "emoji": "9️⃣"},
+      {"vi": "mười", "ja": "10", "emoji": "🔟"}
+    ]
+  },
+  {
+    "id": "do_an",
+    "name": "Đồ ăn",
+    "name_ja": "食べ物",
+    "icon": "🍎",
+    "color": "#FFB7B2",
+    "words": [
+      {"vi": "cơm", "ja": "ご飯", "emoji": "🍚"},
+      {"vi": "phở", "ja": "フォー", "emoji": "🍜"},
+      {"vi": "bánh mì", "ja": "パン", "emoji": "🍞"},
+      {"vi": "trái cây", "ja": "果物", "emoji": "🍉"},
+      {"vi": "kẹo", "ja": "飴", "emoji": "🍬"},
+      {"vi": "sữa", "ja": "牛乳", "emoji": "🥛"},
+      {"vi": "trứng", "ja": "卵", "emoji": "🥚"},
+      {"vi": "rau", "ja": "野菜", "emoji": "🥦"}
+    ]
+  },
+  {
+    "id": "truong_hoc",
+    "name": "Trường học",
+    "name_ja": "学校",
+    "icon": "🎒",
+    "color": "#E2F0CB",
+    "words": [
+      {"vi": "sách", "ja": "本", "emoji": "📖"},
+      {"vi": "bút", "ja": "ペン", "emoji": "✏️"},
+      {"vi": "bàn", "ja": "机", "emoji": "🪵"},
+      {"vi": "ghế", "ja": "椅子", "emoji": "🪑"},
+      {"vi": "cặp sách", "ja": "かばん", "emoji": "🎒"},
+      {"vi": "cô giáo", "ja": "先生", "emoji": "👩‍🏫"},
+      {"vi": "bạn", "ja": "友達", "emoji": "🧑‍🤝‍🧑"},
+      {"vi": "trường học", "ja": "学校", "emoji": "🏫"}
+    ]
+  },
+  {
+    "id": "co_the",
+    "name": "Cơ thể",
+    "name_ja": "体",
+    "icon": "🧍",
+    "color": "#F6DFEB",
+    "words": [
+      {"vi": "đầu", "ja": "頭", "emoji": "🙂"},
+      {"vi": "mắt", "ja": "目", "emoji": "👀"},
+      {"vi": "mũi", "ja": "鼻", "emoji": "👃"},
+      {"vi": "miệng", "ja": "口", "emoji": "👄"},
+      {"vi": "tay", "ja": "手", "emoji": "✋"},
+      {"vi": "chân", "ja": "足", "emoji": "🦶"},
+      {"vi": "tai", "ja": "耳", "emoji": "👂"},
+      {"vi": "tóc", "ja": "髪", "emoji": "💇‍♀️"}
+    ]
+  },
+  {
+    "id": "thoi_tiet",
+    "name": "Thời tiết",
+    "name_ja": "天気",
+    "icon": "☀️",
+    "color": "#FFE5B4",
+    "words": [
+      {"vi": "nắng", "ja": "晴れ", "emoji": "☀️"},
+      {"vi": "mưa", "ja": "雨", "emoji": "🌧️"},
+      {"vi": "gió", "ja": "風", "emoji": "💨"},
+      {"vi": "tuyết", "ja": "雪", "emoji": "❄️"},
+      {"vi": "mây", "ja": "雲", "emoji": "☁️"},
+      {"vi": "cầu vồng", "ja": "虹", "emoji": "🌈"},
+      {"vi": "nóng", "ja": "暑い", "emoji": "🥵"},
+      {"vi": "lạnh", "ja": "寒い", "emoji": "🥶"}
+    ]
+  },
+  {
+    "id": "cam_xuc",
+    "name": "Cảm xúc",
+    "name_ja": "感情",
+    "icon": "😊",
+    "color": "#D4E4FF",
+    "words": [
+      {"vi": "vui", "ja": "嬉しい", "emoji": "😄"},
+      {"vi": "buồn", "ja": "悲しい", "emoji": "😢"},
+      {"vi": "giận", "ja": "怒っている", "emoji": "😠"},
+      {"vi": "sợ", "ja": "怖い", "emoji": "😨"},
+      {"vi": "ngạc nhiên", "ja": "驚き", "emoji": "😲"},
+      {"vi": "yêu", "ja": "大好き", "emoji": "🥰"}
+    ]
+  }
+]

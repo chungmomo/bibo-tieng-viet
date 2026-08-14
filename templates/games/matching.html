@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Nối cặp - {{ topic.name }} - VietKid{% endblock %}
+{% block content %}
+
+<h1 class="page-title">🧩 Nối cặp: {{ topic.name }}</h1>
+<p class="page-subtitle">Lật 2 thẻ giống nhau (từ và hình) để ghép cặp nhé!</p>
+
+<div class="game-header">
+  <div class="game-stat">🔁 Lượt lật: <span id="moves">0</span></div>
+  <div class="game-stat">✅ Cặp đúng: <span id="matches">0</span> / <span id="total-pairs">0</span></div>
+  <a class="btn btn-outline" href="/topics/{{ topic.id }}">⬅️ Quay lại</a>
+</div>
+
+<div id="grid" class="matching-grid"></div>
+
+<div id="result-modal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="big-emoji">🎉</div>
+    <h2>Giỏi quá!</h2>
+    <div class="stars-earned" id="stars-earned"></div>
+    <div class="score-text" id="score-text"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="retry-btn">🔄 Chơi lại</button>
+      <a class="btn btn-outline" href="/topics/{{ topic.id }}">📚 Về chủ đề</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const topicId = {{ topic.id | tojson }};
+const allWords = {{ topic.words | tojson }};
+const PAIR_COUNT = Math.min(6, allWords.length);
+
+let moves = 0, matchesFound = 0, lockBoard = false, firstCard = null;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildDeck() {
+  const chosen = shuffle(allWords).slice(0, PAIR_COUNT);
+  const cards = [];
+  chosen.forEach((w, i) => {
+    cards.push({ pairId: i, display: w.emoji, isWord: false, vi: w.vi });
+    cards.push({ pairId: i, display: w.vi, isWord: true, vi: w.vi });
+  });
+  return shuffle(cards);
+}
+
+function renderGrid() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  document.getElementById("total-pairs").textContent = PAIR_COUNT;
+  const deck = buildDeck();
+  deck.forEach((cardData, idx) => {
+    const el = document.createElement("div");
+    el.className = "match-card";
+    el.dataset.pairId = cardData.pairId;
+    el.dataset.idx = idx;
+    el.innerHTML = `<span class="back-icon">❓</span><span class="content">${cardData.display}</span>`;
+    el.addEventListener("click", () => onCardClick(el));
+    grid.appendChild(el);
+  });
+}
+
+function onCardClick(el) {
+  if (lockBoard || el.classList.contains("revealed") || el.classList.contains("matched")) return;
+  el.classList.add("revealed");
+  VietKidSound.playClick();
+
+  if (!firstCard) {
+    firstCard = el;
+    return;
+  }
+
+  moves++;
+  document.getElementById("moves").textContent = moves;
+
+  if (firstCard.dataset.pairId === el.dataset.pairId && firstCard !== el) {
+    firstCard.classList.add("matched");
+    el.classList.add("matched");
+    matchesFound++;
+    document.getElementById("matches").textContent = matchesFound;
+    firstCard = null;
+    VietKidSound.playCorrect();
+    if (matchesFound === PAIR_COUNT) {
+      setTimeout(finishGame, 500);
+    }
+  } else {
+    lockBoard = true;
+    VietKidSound.playWrong();
+    const wrongFirst = firstCard, wrongSecond = el;
+    wrongFirst.classList.add("wrong");
+    wrongSecond.classList.add("wrong");
+    setTimeout(() => {
+      wrongFirst.classList.remove("revealed", "wrong");
+      wrongSecond.classList.remove("revealed", "wrong");
+      firstCard = null;
+      lockBoard = false;
+    }, 800);
+  }
+}
+
+async function finishGame() {
+  const minMoves = PAIR_COUNT;
+  let stars;
+  if (moves <= minMoves * 1.4) stars = 3;
+  else if (moves <= minMoves * 2.2) stars = 2;
+  else stars = 1;
+
+  document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+  document.getElementById("score-text").textContent = `Hoàn thành với ${moves} lượt lật!`;
+  document.getElementById("result-modal").style.display = "flex";
+  VietKidSound.playCheer();
+  VietKidSound.confettiBurst();
+
+  const profileId = VietKidProfile.getId();
+  if (profileId) {
+    try {
+      await VietKidAPI.saveProgress({
+        profile_id: profileId,
+        topic_id: topicId,
+        game_type: "matching",
+        score: moves,
+        stars: stars,
+      });
+    } catch (e) {}
+  }
+}
+
+function resetGame() {
+  moves = 0; matchesFound = 0; firstCard = null; lockBoard = false;
+  document.getElementById("moves").textContent = 0;
+  document.getElementById("matches").textContent = 0;
+  document.getElementById("result-modal").style.display = "none";
+  renderGrid();
+}
+
+document.getElementById("retry-btn").addEventListener("click", resetGame);
+
+if (!VietKidProfile.getId()) {
+  window.location.href = "/?redirect=" + encodeURIComponent(window.location.pathname);
+} else {
+  renderGrid();
+}
+</script>
+{% endblock %}

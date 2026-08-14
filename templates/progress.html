@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Thành tích - VietKid{% endblock %}
+{% block content %}
+
+<h1 class="page-title">🏆 Thành tích của bé</h1>
+<p class="page-subtitle" id="profile-name-line"></p>
+
+<div class="progress-summary">
+  <div class="progress-stat">
+    <div class="num" id="total-stars">0</div>
+    <div class="label">⭐ Tổng số sao</div>
+  </div>
+  <div class="progress-stat">
+    <div class="num" id="total-badges">0</div>
+    <div class="label">🎖️ Huy hiệu</div>
+  </div>
+  <div class="progress-stat">
+    <div class="num" id="topics-mastered">0</div>
+    <div class="label">✅ Chủ đề đã giỏi</div>
+  </div>
+</div>
+
+<h3>Huy hiệu đã đạt được</h3>
+<div class="badge-row" id="badges-list" style="margin-bottom:30px;"></div>
+
+<h3>Tiến trình từng chủ đề</h3>
+<div id="topics-list"></div>
+
+<div style="text-align:center; margin-top:20px;">
+  <a class="btn btn-outline" href="/topics">📚 Học thêm từ vựng</a>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadProgress() {
+  const profileId = VietKidProfile.getId();
+  if (!profileId) {
+    window.location.href = "/?redirect=" + encodeURIComponent(window.location.pathname);
+    return;
+  }
+  const profile = await VietKidAPI.getProfile(profileId);
+  document.getElementById("profile-name-line").textContent = `${profile.avatar} ${profile.name}`;
+  document.getElementById("total-stars").textContent = profile.total_stars;
+  document.getElementById("total-badges").textContent = profile.badges.length;
+
+  const topicsEntries = Object.entries(profile.topics);
+  const masteredCount = topicsEntries.filter(([, info]) => info.mastered).length;
+  document.getElementById("topics-mastered").textContent = masteredCount;
+
+  const badgesList = document.getElementById("badges-list");
+  badgesList.innerHTML = profile.badges.length
+    ? profile.badges.map((b) => `<span class="badge-chip"><span class="badge-icon">${b.icon}</span> ${b.label}</span>`).join("")
+    : `<span class="badge-chip">Chưa có huy hiệu nào. Học thêm để nhận huy hiệu nhé!</span>`;
+
+  const topicsList = document.getElementById("topics-list");
+  topicsList.innerHTML = topicsEntries
+    .map(([id, info]) => {
+      const pct = Math.round((info.stars / info.max_stars) * 100);
+      return `
+        <div class="progress-topic">
+          <div class="icon">${info.icon}</div>
+          <div class="info">
+            <div class="name">${info.name} ${info.mastered ? "✅" : ""}</div>
+            <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${pct}%;"></div></div>
+          </div>
+          <div>⭐ ${info.stars}/${info.max_stars}</div>
+        </div>`;
+    })
+    .join("");
+}
+
+loadProgress();
+</script>
+{% endblock %}

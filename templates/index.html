@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}VietKid - Trang chủ{% endblock %}
+{% block content %}
+
+<div id="select-screen" style="display:none;">
+  <h1 class="page-title">Chào mừng công chúa nhỏ đến với VietKid! 👑✨</h1>
+  <p class="page-subtitle">Chọn hồ sơ của bé để bắt đầu học tiếng Việt nhé</p>
+
+  <div id="profile-grid" class="profile-grid"></div>
+
+  <div id="create-form" class="card-panel" style="display:none; margin-top:20px;">
+    <h3>Tạo hồ sơ mới 🎀</h3>
+    <p class="page-subtitle" style="margin-bottom:10px;">Bé tên là gì?</p>
+    <input id="name-input" class="text-input" maxlength="40" placeholder="Nhập tên của bé...">
+    <p class="page-subtitle" style="margin:14px 0 4px;">Chọn hình đại diện cho bé</p>
+    <div id="avatar-picker" class="avatar-picker"></div>
+    <button class="btn btn-primary btn-block btn-lg" id="create-btn" style="margin-top:10px;">Bắt đầu học! ✨</button>
+    <p id="create-error" style="color:var(--red); font-weight:700; display:none; margin-top:10px;"></p>
+  </div>
+
+  <div style="text-align:center; margin-top:20px;">
+    <button class="btn btn-outline" id="show-create-btn">➕ Tạo hồ sơ mới</button>
+  </div>
+</div>
+
+<div id="dashboard-screen" style="display:none;">
+  <div class="welcome-banner">
+    <div class="who">
+      <span class="avatar" id="dash-avatar">👸</span>
+      <div>
+        <h2 id="dash-greeting">Chào bé!</h2>
+        <div id="dash-badges" class="badge-row"></div>
+      </div>
+    </div>
+    <div class="stars-total">⭐ <span id="dash-stars">0</span> sao</div>
+  </div>
+
+  <div class="quick-links">
+    <a class="quick-link-card" href="/alphabet">
+      <span class="icon">🔤</span>
+      <div class="title">Bảng chữ cái</div>
+      <div class="desc">Học 29 chữ cái tiếng Việt</div>
+    </a>
+    <a class="quick-link-card" href="/writing">
+      <span class="icon">✍️</span>
+      <div class="title">Tập viết</div>
+      <div class="desc">Tô theo hình chữ mờ</div>
+    </a>
+    <a class="quick-link-card" href="/topics">
+      <span class="icon">📚</span>
+      <div class="title">Từ vựng</div>
+      <div class="desc">9 chủ đề thú vị</div>
+    </a>
+    <a class="quick-link-card" href="/topics">
+      <span class="icon">🎮</span>
+      <div class="title">Trò chơi</div>
+      <div class="desc">Nối cặp, đố vui, ghép chữ</div>
+    </a>
+    <a class="quick-link-card" href="/progress">
+      <span class="icon">🏆</span>
+      <div class="title">Thành tích</div>
+      <div class="desc">Xem sao và huy hiệu của bé</div>
+    </a>
+  </div>
+
+  <div style="text-align:center;">
+    <button class="btn btn-outline" id="switch-profile-btn">🔄 Đổi hồ sơ khác</button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const AVATARS_FALLBACK = ["👸","🧚‍♀️","🦄","🧜‍♀️","🎀","🐰","🐱","🐻","🐨","🦋"];
+let selectedAvatar = null;
+
+function getRedirectTarget() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("redirect") || "/";
+}
+
+async function renderProfileGrid() {
+  const grid = document.getElementById("profile-grid");
+  grid.innerHTML = "<p>Đang tải...</p>";
+  const profiles = await VietKidAPI.getProfiles();
+  grid.innerHTML = "";
+  profiles.forEach((p) => {
+    const card = document.createElement("button");
+    card.className = "profile-card";
+    card.style = "width:100%;";
+    card.innerHTML = `<div class="avatar">${p.avatar}</div><div class="name">${p.name}</div><div class="stars">⭐ ${p.total_stars}</div>`;
+    card.onclick = () => chooseProfile(p.id);
+    grid.appendChild(card);
+  });
+  const newCard = document.createElement("button");
+  newCard.className = "new-profile-card";
+  newCard.innerHTML = `<span style="font-size:2rem;">➕</span><span>Hồ sơ mới</span>`;
+  newCard.onclick = showCreateForm;
+  grid.appendChild(newCard);
+}
+
+function chooseProfile(id) {
+  VietKidProfile.setId(id);
+  VietKidSound.playCorrect();
+  window.location.href = getRedirectTarget();
+}
+
+async function showCreateForm() {
+  document.getElementById("create-form").style.display = "block";
+  const picker = document.getElementById("avatar-picker");
+  if (picker.childElementCount === 0) {
+    let avatars = AVATARS_FALLBACK;
+    try { avatars = await VietKidAPI.getAvatars(); } catch (e) {}
+    avatars.forEach((a) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = a;
+      btn.onclick = () => {
+        selectedAvatar = a;
+        [...picker.children].forEach((c) => c.classList.remove("selected"));
+        btn.classList.add("selected");
+      };
+      picker.appendChild(btn);
+    });
+    picker.firstChild.click();
+  }
+}
+
+async function createProfile() {
+  const nameInput = document.getElementById("name-input");
+  const errorEl = document.getElementById("create-error");
+  const name = nameInput.value.trim();
+  errorEl.style.display = "none";
+  if (!name) {
+    errorEl.textContent = "Bé ơi, hãy nhập tên nhé!";
+    errorEl.style.display = "block";
+    return;
+  }
+  try {
+    const profile = await VietKidAPI.createProfile(name, selectedAvatar || AVATARS_FALLBACK[0]);
+    chooseProfile(profile.id);
+  } catch (e) {
+    errorEl.textContent = e.message;
+    errorEl.style.display = "block";
+  }
+}
+
+async function renderDashboard(profileId) {
+  const profile = await VietKidAPI.getProfile(profileId);
+  document.getElementById("dash-avatar").textContent = profile.avatar;
+  document.getElementById("dash-greeting").textContent = `Chào ${profile.name}! Hôm nay học gì nào?`;
+  document.getElementById("dash-stars").textContent = profile.total_stars;
+  const badgesEl = document.getElementById("dash-badges");
+  badgesEl.innerHTML = profile.badges.length
+    ? profile.badges.map((b) => `<span class="badge-chip"><span class="badge-icon">${b.icon}</span> ${b.label}</span>`).join("")
+    : `<span class="badge-chip">🌸 Bé mới bắt đầu hành trình!</span>`;
+}
+
+document.getElementById("show-create-btn").addEventListener("click", showCreateForm);
+document.getElementById("create-btn").addEventListener("click", createProfile);
+document.getElementById("switch-profile-btn").addEventListener("click", () => {
+  VietKidProfile.clear();
+  location.reload();
+});
+
+(async function init() {
+  const profileId = VietKidProfile.getId();
+  if (profileId) {
+    try {
+      await renderDashboard(profileId);
+      document.getElementById("dashboard-screen").style.display = "block";
+      return;
+    } catch (e) {
+      VietKidProfile.clear();
+    }
+  }
+  document.getElementById("select-screen").style.display = "block";
+  renderProfileGrid();
+})();
+</script>
+{% endblock %}
