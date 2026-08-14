@@ -1,0 +1,15 @@
+rules_version = '2';
+
+// VietKid - quy tắc bảo mật Firestore.
+// Mỗi phụ huynh chỉ đọc/ghi được đúng dữ liệu của mình (hồ sơ bé + tiến
+// trình học), xác định qua uid đăng nhập (request.auth.uid).
+//
+// Cách áp dụng: Firebase Console > Firestore Database > Rules > dán toàn
+// bộ nội dung file này > Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
