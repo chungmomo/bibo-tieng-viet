@@ -1,5 +1,5 @@
 /* ==========================================================================
-   VietKid - giao diện học tiếng Việt phong cách công chúa cho bé gái
+   VietKid - giao diện học tiếng Việt cho bé
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap');
@@ -233,6 +233,11 @@ main {
 .btn-lg { padding: 16px 34px; font-size: 1.15rem; }
 .btn-block { width: 100%; justify-content: center; }
 .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------- */
+/* Đăng nhập / đăng ký                                                    */
+/* ---------------------------------------------------------------------- */
+.card-panel a { color: var(--pink-deep); font-weight: 700; text-decoration: underline; }
 
 /* ---------------------------------------------------------------------- */
 /* Profile select screen                                                  */

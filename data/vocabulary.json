@@ -155,5 +155,39 @@
       {"vi": "ngạc nhiên", "ja": "驚き", "emoji": "😲"},
       {"vi": "yêu", "ja": "大好き", "emoji": "🥰"}
     ]
+  },
+  {
+    "id": "phuong_tien",
+    "name": "Phương tiện",
+    "name_ja": "乗り物",
+    "icon": "🚗",
+    "color": "#BDE0FE",
+    "words": [
+      {"vi": "ô tô", "ja": "車", "emoji": "🚗"},
+      {"vi": "xe buýt", "ja": "バス", "emoji": "🚌"},
+      {"vi": "xe đạp", "ja": "自転車", "emoji": "🚲"},
+      {"vi": "tàu hỏa", "ja": "電車", "emoji": "🚆"},
+      {"vi": "máy bay", "ja": "飛行機", "emoji": "✈️"},
+      {"vi": "thuyền", "ja": "船", "emoji": "⛵"},
+      {"vi": "xe máy", "ja": "バイク", "emoji": "🏍️"},
+      {"vi": "taxi", "ja": "タクシー", "emoji": "🚕"}
+    ]
+  },
+  {
+    "id": "nghe_nghiep",
+    "name": "Nghề nghiệp",
+    "name_ja": "職業",
+    "icon": "👩‍⚕️",
+    "color": "#FFD6A5",
+    "words": [
+      {"vi": "bác sĩ", "ja": "医者", "emoji": "👩‍⚕️"},
+      {"vi": "giáo viên", "ja": "先生", "emoji": "👨‍🏫"},
+      {"vi": "cảnh sát", "ja": "警察官", "emoji": "👮"},
+      {"vi": "đầu bếp", "ja": "料理人", "emoji": "👨‍🍳"},
+      {"vi": "phi công", "ja": "パイロット", "emoji": "👨‍✈️"},
+      {"vi": "nông dân", "ja": "農家", "emoji": "👨‍🌾"},
+      {"vi": "ca sĩ", "ja": "歌手", "emoji": "🧑‍🎤"},
+      {"vi": "họa sĩ", "ja": "画家", "emoji": "🧑‍🎨"}
+    ]
   }
 ]
