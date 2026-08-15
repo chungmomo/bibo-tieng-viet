@@ -97,6 +97,7 @@ function parseHash() {
 
 async function route() {
   window.scrollTo(0, 0);
+  stopMascot();
   const parts = parseHash();
   await renderHeader();
   if (parts.length === 0) return renderHome();
@@ -128,6 +129,22 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+/* Lời khen + emoji thay đổi theo số sao đạt được, chọn ngẫu nhiên trong vài
+   biến thể mỗi bậc để không lặp lại y hệt nhau mỗi lần chơi xong. */
+const RESULT_MESSAGES = {
+  3: { emojis: ["🌟", "🏆", "👑", "🎉"], titles: ["Xuất sắc!", "Tuyệt vời!", "Giỏi quá đi mất!", "Quá đỉnh luôn!"] },
+  2: { emojis: ["😊", "👏", "✨"], titles: ["Giỏi lắm!", "Làm tốt lắm!", "Cố thêm xíu nữa là max sao!"] },
+  1: { emojis: ["🙂", "💪", "🌱"], titles: ["Cố lên nhé!", "Sắp được rồi!", "Luyện thêm chút nữa nhé!"] },
+  0: { emojis: ["🙂", "💪", "🌱"], titles: ["Cố lên nhé!", "Sắp được rồi!", "Luyện thêm chút nữa nhé!"] },
+};
+function pickResultMessage(stars) {
+  const tier = RESULT_MESSAGES[stars] || RESULT_MESSAGES[0];
+  return {
+    emoji: tier.emojis[Math.floor(Math.random() * tier.emojis.length)],
+    title: tier.titles[Math.floor(Math.random() * tier.titles.length)],
+  };
 }
 
 /* Phát lại animation "nảy vào" cho 1 emoji khi nội dung của nó đổi
@@ -244,9 +261,53 @@ async function chooseProfile(id) {
   }
 }
 
+const MASCOT_MESSAGES = [
+  "Học từ mới mỗi ngày, bé sẽ giỏi tiếng Việt cực nhanh đó! 🚀",
+  "Rồng Con tin bé làm được! Cố lên nào! 💪",
+  "Bé nhớ nghe phát âm thật kỹ trước khi làm bài nhé! 👂",
+  "Sao lấp lánh đang chờ bé đó, đi lấy thôi! ⭐",
+  "Học một chút mỗi ngày, giỏi hơn mỗi ngày nha bé! 🌱",
+  "Rồng Con rất vui khi được học cùng bé! 🐉💕",
+];
+let mascotInterval = null;
+
+function stopMascot() {
+  if (mascotInterval) {
+    clearInterval(mascotInterval);
+    mascotInterval = null;
+  }
+}
+
+function renderMascotBuddy() {
+  stopMascot();
+  const bubble = document.getElementById("mascot-bubble");
+  const face = document.getElementById("mascot-face");
+  if (!bubble || !face) return;
+
+  let idx = Math.floor(Math.random() * MASCOT_MESSAGES.length);
+  function showMessage() {
+    bubble.textContent = MASCOT_MESSAGES[idx];
+    idx = (idx + 1) % MASCOT_MESSAGES.length;
+    popEmoji(bubble);
+  }
+  showMessage();
+  mascotInterval = setInterval(showMessage, 6000);
+  face.addEventListener("click", () => {
+    showMessage();
+    popEmoji(face);
+    VietKidSound.playClick();
+  });
+}
+
 function renderDashboard(profile) {
   app.innerHTML =
     '<div class="welcome-banner">' +
+    '  <div class="floaty-decor" aria-hidden="true">' +
+    '    <span style="left:5%; animation-delay:0s;">⭐</span>' +
+    '    <span style="left:20%; top:60%; animation-delay:0.6s;">🎈</span>' +
+    '    <span style="left:75%; animation-delay:1.1s;">✨</span>' +
+    '    <span style="left:88%; top:55%; animation-delay:0.3s;">💫</span>' +
+    '  </div>' +
     '  <div class="who">' +
     '    <span class="avatar">' + profile.avatar + '</span>' +
     '    <div>' +
@@ -263,13 +324,18 @@ function renderDashboard(profile) {
     '  <a class="quick-link-card" href="#/topics"><span class="icon">🎮</span><div class="title">Trò chơi</div><div class="desc">Nối cặp, đố vui, ghép chữ</div></a>' +
     '  <a class="quick-link-card" href="#/progress"><span class="icon">🏆</span><div class="title">Thành tích</div><div class="desc">Xem sao và huy hiệu của bé</div></a>' +
     '</div>' +
-    '<div style="text-align:center;"><button class="btn btn-outline" id="switch-profile-btn">🔄 Đổi hồ sơ khác</button></div>';
+    '<div style="text-align:center;"><button class="btn btn-outline" id="switch-profile-btn">🔄 Đổi hồ sơ khác</button></div>' +
+    '<div class="mascot-buddy">' +
+    '  <div class="mascot-bubble" id="mascot-bubble"></div>' +
+    '  <button class="mascot-face" id="mascot-face" type="button" aria-label="Rồng Con động viên bé">🐉</button>' +
+    '</div>';
 
   document.getElementById("switch-profile-btn").addEventListener("click", async () => {
     Store.clearCurrentProfile(currentUser.uid);
     await renderHeader();
     route();
   });
+  renderMascotBuddy();
 }
 
 function renderBadgeChips(badges) {
@@ -588,6 +654,7 @@ function renderVocabulary(topicId) {
     '  <a class="btn btn-primary btn-lg" href="#/games/' + topic.id + '/matching">🧩 Trò chơi nối cặp</a>' +
     '  <a class="btn btn-green btn-lg" href="#/games/' + topic.id + '/quiz">❓ Đố vui</a>' +
     '  <a class="btn" style="background:var(--lavender); color:#fff;" href="#/games/' + topic.id + '/spelling">🔡 Ghép chữ</a>' +
+    '  <a class="btn" style="background:var(--blue); color:#fff;" href="#/games/' + topic.id + '/listening">👂 Nghe và đoán</a>' +
     '</div>';
 
   const words = topic.words;
@@ -630,6 +697,7 @@ function renderGame(topicId, gameType) {
   if (gameType === "matching") return renderMatchingGame(topic);
   if (gameType === "quiz") return renderQuizGame(topic);
   if (gameType === "spelling") return renderSpellingGame(topic);
+  if (gameType === "listening") return renderListeningGame(topic);
 }
 
 function gameShell(topic, titleIcon, titleText, subtitle, bodyHtml, modalIcon, modalTitle) {
@@ -643,8 +711,8 @@ function gameShell(topic, titleIcon, titleText, subtitle, bodyHtml, modalIcon, m
     bodyHtml +
     '<div id="result-modal" class="modal-overlay" style="display:none;">' +
     '  <div class="modal-box">' +
-    '    <div class="big-emoji">' + modalIcon + '</div>' +
-    '    <h2>' + modalTitle + '</h2>' +
+    '    <div class="big-emoji" id="modal-emoji">' + modalIcon + '</div>' +
+    '    <h2 id="modal-title">' + modalTitle + '</h2>' +
     '    <div class="stars-earned" id="stars-earned"></div>' +
     '    <div class="score-text" id="score-text"></div>' +
     '    <div class="modal-actions">' +
@@ -736,6 +804,9 @@ function renderMatchingGame(topic) {
     else if (moves <= minMoves * 2.2) stars = 2;
     else stars = 1;
 
+    const msg = pickResultMessage(stars);
+    document.getElementById("modal-emoji").textContent = msg.emoji;
+    document.getElementById("modal-title").textContent = msg.title;
     document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
     document.getElementById("score-text").textContent = "Hoàn thành với " + moves + " lượt lật!";
     document.getElementById("result-modal").style.display = "flex";
@@ -836,6 +907,9 @@ function renderQuizGame(topic) {
     else if (pct >= 0.6) stars = 2;
     else stars = 1;
 
+    const msg = pickResultMessage(stars);
+    document.getElementById("modal-emoji").textContent = msg.emoji;
+    document.getElementById("modal-title").textContent = msg.title;
     document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
     document.getElementById("score-text").textContent = "Đúng " + correctCount + "/" + order.length + " câu!";
     document.getElementById("result-modal").style.display = "flex";
@@ -983,6 +1057,9 @@ function renderSpellingGame(topic) {
     else if (mistakesTotal <= order.length) stars = 2;
     else stars = 1;
 
+    const msg = pickResultMessage(stars);
+    document.getElementById("modal-emoji").textContent = msg.emoji;
+    document.getElementById("modal-title").textContent = msg.title;
     document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
     document.getElementById("score-text").textContent = "Ghép đúng ngay " + correctCount + "/" + order.length + " từ!";
     document.getElementById("result-modal").style.display = "flex";
@@ -1003,6 +1080,106 @@ function renderSpellingGame(topic) {
 
   document.getElementById("hint-btn").addEventListener("click", () => VietKidSpeech.speakVi(order[qIndex].vi));
   document.getElementById("clear-btn").addEventListener("click", clearSlots);
+  document.getElementById("retry-btn").addEventListener("click", startGame);
+  startGame();
+}
+
+/* ---- Nghe và đoán (listening) ---- */
+function renderListeningGame(topic) {
+  gameShell(
+    topic, "👂", "Nghe và đoán", "Bấm loa để nghe từ tiếng Việt, rồi chọn đúng hình nhé!",
+    '<div class="listening-prompt">' +
+    '  <button class="btn btn-blue btn-lg" id="play-btn">🔊 Nghe từ</button>' +
+    '</div>' +
+    '<div class="quiz-options" id="options"></div>',
+    "🎧", "Tai bé thính quá!"
+  );
+
+  const allWords = topic.words;
+  let order = [], qIndex = 0, correctCount = 0, answered = false;
+
+  function updateStats() {
+    document.getElementById("game-stats").innerHTML =
+      '<div class="game-stat">📋 Câu: ' + (qIndex + 1) + ' / ' + order.length + '</div>' +
+      '<div class="game-stat" style="margin-left:8px;">✅ Đúng: ' + correctCount + '</div>';
+  }
+
+  function buildOptions(correctWord) {
+    const distractors = shuffle(allWords.filter((w) => w.vi !== correctWord.vi)).slice(0, 3);
+    return shuffle([correctWord].concat(distractors));
+  }
+
+  function renderQuestion() {
+    answered = false;
+    const word = order[qIndex];
+    updateStats();
+
+    const optionsEl = document.getElementById("options");
+    optionsEl.innerHTML = "";
+    buildOptions(word).forEach((opt) => {
+      const btn = document.createElement("button");
+      btn.className = "quiz-option emoji-option";
+      btn.textContent = opt.emoji;
+      btn.setAttribute("aria-label", opt.vi);
+      btn.addEventListener("click", () => onAnswer(btn, opt, word));
+      optionsEl.appendChild(btn);
+    });
+
+    VietKidSpeech.speakVi(word.vi);
+  }
+
+  function onAnswer(btn, opt, correctWord) {
+    if (answered) return;
+    answered = true;
+    const isCorrect = opt.vi === correctWord.vi;
+    btn.classList.add(isCorrect ? "correct" : "incorrect");
+    if (isCorrect) {
+      correctCount++;
+      updateStats();
+      VietKidSound.playCorrect();
+    } else {
+      VietKidSound.playWrong();
+      [...document.getElementById("options").children].forEach((c) => {
+        if (c.getAttribute("aria-label") === correctWord.vi) c.classList.add("correct");
+      });
+    }
+
+    setTimeout(() => {
+      qIndex++;
+      if (qIndex < order.length) renderQuestion();
+      else finishGame();
+    }, 1300);
+  }
+
+  async function finishGame() {
+    const pct = correctCount / order.length;
+    let stars;
+    if (pct >= 0.9) stars = 3;
+    else if (pct >= 0.6) stars = 2;
+    else stars = 1;
+
+    const msg = pickResultMessage(stars);
+    document.getElementById("modal-emoji").textContent = msg.emoji;
+    document.getElementById("modal-title").textContent = msg.title;
+    document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+    document.getElementById("score-text").textContent = "Nghe đúng " + correctCount + "/" + order.length + " từ!";
+    document.getElementById("result-modal").style.display = "flex";
+    VietKidSound.playCheer();
+    VietKidSound.confettiBurst();
+
+    const profileId = Store.getCurrentProfileId(currentUser.uid);
+    if (profileId) await Store.saveProgress(currentUser.uid, profileId, topic.id, "listening", correctCount, stars);
+    await renderHeader();
+  }
+
+  function startGame() {
+    order = shuffle(allWords);
+    qIndex = 0; correctCount = 0;
+    document.getElementById("result-modal").style.display = "none";
+    renderQuestion();
+  }
+
+  document.getElementById("play-btn").addEventListener("click", () => VietKidSpeech.speakVi(order[qIndex].vi));
   document.getElementById("retry-btn").addEventListener("click", startGame);
   startGame();
 }
