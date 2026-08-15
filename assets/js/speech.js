@@ -8,11 +8,25 @@ if ("speechSynthesis" in window) {
   window.speechSynthesis.onvoiceschanged = loadVoices;
 }
 
+/* Giọng "Google" (VD: "Google Tiếng Việt", "Google 日本語") nghe tự nhiên
+   hơn hẳn giọng mặc định của hệ điều hành — ưu tiên chọn giọng này nếu
+   trình duyệt có (Chrome/Edge trên máy có kết nối mạng). */
+function isGoogleVoice(v) {
+  return /google/i.test(v.name) || /google/i.test(v.voiceURI || "");
+}
+
 function pickVoice(lang) {
-  const exact = voices.find((v) => v.lang === lang);
-  if (exact) return exact;
   const prefix = lang.split("-")[0];
-  return voices.find((v) => v.lang && v.lang.startsWith(prefix)) || null;
+  const matchesLang = (v) => v.lang === lang;
+  const matchesPrefix = (v) => v.lang && v.lang.startsWith(prefix);
+
+  return (
+    voices.find((v) => matchesLang(v) && isGoogleVoice(v)) ||
+    voices.find((v) => matchesPrefix(v) && isGoogleVoice(v)) ||
+    voices.find(matchesLang) ||
+    voices.find(matchesPrefix) ||
+    null
+  );
 }
 
 function speak(text, lang) {

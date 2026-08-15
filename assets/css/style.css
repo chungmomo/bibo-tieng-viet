@@ -353,6 +353,63 @@ main {
 .welcome-banner h2 { margin: 0; font-size: 1.6rem; }
 .welcome-banner .stars-total { font-size: 1.3rem; font-weight: 800; z-index: 1; }
 
+/* Trang trí bay lơ lửng trong banner chào mừng — cho cảm giác sinh động */
+.floaty-decor { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.floaty-decor span {
+  position: absolute;
+  top: 12px;
+  font-size: 1.5rem;
+  opacity: 0.8;
+  animation: floaty 3.2s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Linh vật (mascot)                                                      */
+/* ---------------------------------------------------------------------- */
+.mascot-buddy {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.mascot-face {
+  font-size: 2.4rem;
+  background: #fff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  animation: bounce 2.4s ease-in-out infinite;
+  align-self: flex-end;
+}
+
+.mascot-bubble {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  max-width: 220px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .mascot-buddy { right: 10px; bottom: 10px; }
+  .mascot-face { width: 48px; height: 48px; font-size: 1.9rem; }
+  .mascot-bubble { max-width: 150px; font-size: 0.75rem; padding: 8px 12px; }
+}
+
 .quick-links {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -725,6 +782,10 @@ main {
 .quiz-option:hover { border-color: var(--pink); }
 .quiz-option.correct { background: var(--green); color: #fff; border-color: var(--green); }
 .quiz-option.incorrect { background: var(--red); color: #fff; border-color: var(--red); }
+
+/* Nghe và đoán (listening game) */
+.listening-prompt { text-align: center; margin-bottom: 24px; }
+.quiz-option.emoji-option { font-size: 2.6rem; padding: 22px; }
 
 /* Spelling game */
 .spelling-target {

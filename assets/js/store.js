@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { getContent } from "./data.js";
 
-export const GAME_TYPES = ["matching", "quiz", "spelling"];
+export const GAME_TYPES = ["matching", "quiz", "spelling", "listening"];
 export const MAX_STARS_PER_GAME = 3;
 
 const MILESTONE_BADGES = [

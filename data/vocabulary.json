@@ -13,7 +13,10 @@
       {"vi": "em bé", "ja": "赤ちゃん", "emoji": "👶"},
       {"vi": "ông", "ja": "おじいさん", "emoji": "👴"},
       {"vi": "bà", "ja": "おばあさん", "emoji": "👵"},
-      {"vi": "con", "ja": "子供", "emoji": "🧒"}
+      {"vi": "con", "ja": "子供", "emoji": "🧒"},
+      {"vi": "chú", "ja": "おじさん", "emoji": "🧔"},
+      {"vi": "cô", "ja": "おばさん", "emoji": "👩‍🦰"},
+      {"vi": "gia đình", "ja": "家族", "emoji": "👨‍👩‍👧‍👦"}
     ]
   },
   {
@@ -32,7 +35,13 @@
       {"vi": "hổ", "ja": "とら", "emoji": "🐯"},
       {"vi": "thỏ", "ja": "うさぎ", "emoji": "🐰"},
       {"vi": "gấu", "ja": "くま", "emoji": "🐻"},
-      {"vi": "chim", "ja": "鳥", "emoji": "🐦"}
+      {"vi": "chim", "ja": "鳥", "emoji": "🐦"},
+      {"vi": "sư tử", "ja": "ライオン", "emoji": "🦁"},
+      {"vi": "khỉ", "ja": "サル", "emoji": "🐒"},
+      {"vi": "ngựa", "ja": "馬", "emoji": "🐴"},
+      {"vi": "cừu", "ja": "羊", "emoji": "🐑"},
+      {"vi": "rắn", "ja": "ヘビ", "emoji": "🐍"},
+      {"vi": "bướm", "ja": "蝶", "emoji": "🦋"}
     ]
   },
   {
@@ -51,7 +60,8 @@
       {"vi": "cam", "ja": "オレンジ", "emoji": "🟠"},
       {"vi": "trắng", "ja": "白", "emoji": "⚪"},
       {"vi": "đen", "ja": "黒", "emoji": "⚫"},
-      {"vi": "nâu", "ja": "茶色", "emoji": "🟤"}
+      {"vi": "nâu", "ja": "茶色", "emoji": "🟤"},
+      {"vi": "xám", "ja": "灰色", "emoji": "🩶"}
     ]
   },
   {
@@ -61,6 +71,7 @@
     "icon": "🔢",
     "color": "#C7CEEA",
     "words": [
+      {"vi": "không", "ja": "0", "emoji": "0️⃣"},
       {"vi": "một", "ja": "1", "emoji": "1️⃣"},
       {"vi": "hai", "ja": "2", "emoji": "2️⃣"},
       {"vi": "ba", "ja": "3", "emoji": "3️⃣"},
@@ -87,7 +98,12 @@
       {"vi": "kẹo", "ja": "飴", "emoji": "🍬"},
       {"vi": "sữa", "ja": "牛乳", "emoji": "🥛"},
       {"vi": "trứng", "ja": "卵", "emoji": "🥚"},
-      {"vi": "rau", "ja": "野菜", "emoji": "🥦"}
+      {"vi": "rau", "ja": "野菜", "emoji": "🥦"},
+      {"vi": "bánh ngọt", "ja": "お菓子", "emoji": "🍰"},
+      {"vi": "chuối", "ja": "バナナ", "emoji": "🍌"},
+      {"vi": "táo", "ja": "りんご", "emoji": "🍎"},
+      {"vi": "nước", "ja": "水", "emoji": "💧"},
+      {"vi": "mì", "ja": "麺", "emoji": "🍝"}
     ]
   },
   {
@@ -104,7 +120,10 @@
       {"vi": "cặp sách", "ja": "かばん", "emoji": "🎒"},
       {"vi": "cô giáo", "ja": "先生", "emoji": "👩‍🏫"},
       {"vi": "bạn", "ja": "友達", "emoji": "🧑‍🤝‍🧑"},
-      {"vi": "trường học", "ja": "学校", "emoji": "🏫"}
+      {"vi": "trường học", "ja": "学校", "emoji": "🏫"},
+      {"vi": "thước kẻ", "ja": "定規", "emoji": "📏"},
+      {"vi": "máy tính", "ja": "コンピューター", "emoji": "💻"},
+      {"vi": "kéo", "ja": "はさみ", "emoji": "✂️"}
     ]
   },
   {
@@ -121,7 +140,9 @@
       {"vi": "tay", "ja": "手", "emoji": "✋"},
       {"vi": "chân", "ja": "足", "emoji": "🦶"},
       {"vi": "tai", "ja": "耳", "emoji": "👂"},
-      {"vi": "tóc", "ja": "髪", "emoji": "💇‍♀️"}
+      {"vi": "tóc", "ja": "髪", "emoji": "💇‍♀️"},
+      {"vi": "răng", "ja": "歯", "emoji": "🦷"},
+      {"vi": "mặt", "ja": "顔", "emoji": "😀"}
     ]
   },
   {
@@ -138,7 +159,9 @@
       {"vi": "mây", "ja": "雲", "emoji": "☁️"},
       {"vi": "cầu vồng", "ja": "虹", "emoji": "🌈"},
       {"vi": "nóng", "ja": "暑い", "emoji": "🥵"},
-      {"vi": "lạnh", "ja": "寒い", "emoji": "🥶"}
+      {"vi": "lạnh", "ja": "寒い", "emoji": "🥶"},
+      {"vi": "sấm sét", "ja": "雷", "emoji": "⚡"},
+      {"vi": "sương mù", "ja": "霧", "emoji": "🌫️"}
     ]
   },
   {
@@ -153,7 +176,10 @@
       {"vi": "giận", "ja": "怒っている", "emoji": "😠"},
       {"vi": "sợ", "ja": "怖い", "emoji": "😨"},
       {"vi": "ngạc nhiên", "ja": "驚き", "emoji": "😲"},
-      {"vi": "yêu", "ja": "大好き", "emoji": "🥰"}
+      {"vi": "yêu", "ja": "大好き", "emoji": "🥰"},
+      {"vi": "mệt", "ja": "疲れた", "emoji": "😴"},
+      {"vi": "tự hào", "ja": "誇り", "emoji": "😌"},
+      {"vi": "xấu hổ", "ja": "恥ずかしい", "emoji": "😳"}
     ]
   },
   {
@@ -170,7 +196,9 @@
       {"vi": "máy bay", "ja": "飛行機", "emoji": "✈️"},
       {"vi": "thuyền", "ja": "船", "emoji": "⛵"},
       {"vi": "xe máy", "ja": "バイク", "emoji": "🏍️"},
-      {"vi": "taxi", "ja": "タクシー", "emoji": "🚕"}
+      {"vi": "taxi", "ja": "タクシー", "emoji": "🚕"},
+      {"vi": "trực thăng", "ja": "ヘリコプター", "emoji": "🚁"},
+      {"vi": "xe cứu thương", "ja": "救急車", "emoji": "🚑"}
     ]
   },
   {
@@ -187,7 +215,61 @@
       {"vi": "phi công", "ja": "パイロット", "emoji": "👨‍✈️"},
       {"vi": "nông dân", "ja": "農家", "emoji": "👨‍🌾"},
       {"vi": "ca sĩ", "ja": "歌手", "emoji": "🧑‍🎤"},
-      {"vi": "họa sĩ", "ja": "画家", "emoji": "🧑‍🎨"}
+      {"vi": "họa sĩ", "ja": "画家", "emoji": "🧑‍🎨"},
+      {"vi": "lính cứu hỏa", "ja": "消防士", "emoji": "🧑‍🚒"},
+      {"vi": "vận động viên", "ja": "スポーツ選手", "emoji": "🏃"}
+    ]
+  },
+  {
+    "id": "thien_nhien",
+    "name": "Thiên nhiên",
+    "name_ja": "自然",
+    "icon": "🌿",
+    "color": "#C8E6C9",
+    "words": [
+      {"vi": "cây", "ja": "木", "emoji": "🌳"},
+      {"vi": "hoa", "ja": "花", "emoji": "🌸"},
+      {"vi": "núi", "ja": "山", "emoji": "⛰️"},
+      {"vi": "sông", "ja": "川", "emoji": "🏞️"},
+      {"vi": "biển", "ja": "海", "emoji": "🌊"},
+      {"vi": "mặt trời", "ja": "太陽", "emoji": "☀️"},
+      {"vi": "mặt trăng", "ja": "月", "emoji": "🌙"},
+      {"vi": "ngôi sao", "ja": "星", "emoji": "⭐"},
+      {"vi": "lá cây", "ja": "葉っぱ", "emoji": "🍃"}
+    ]
+  },
+  {
+    "id": "do_dung_gia_dinh",
+    "name": "Đồ dùng trong nhà",
+    "name_ja": "家の道具",
+    "icon": "🏠",
+    "color": "#F8E1F4",
+    "words": [
+      {"vi": "giường", "ja": "ベッド", "emoji": "🛏️"},
+      {"vi": "tivi", "ja": "テレビ", "emoji": "📺"},
+      {"vi": "điện thoại", "ja": "電話", "emoji": "📱"},
+      {"vi": "đèn", "ja": "ランプ", "emoji": "💡"},
+      {"vi": "cửa", "ja": "ドア", "emoji": "🚪"},
+      {"vi": "sofa", "ja": "ソファー", "emoji": "🛋️"},
+      {"vi": "gương", "ja": "鏡", "emoji": "🪞"},
+      {"vi": "chìa khóa", "ja": "鍵", "emoji": "🔑"}
+    ]
+  },
+  {
+    "id": "the_thao_so_thich",
+    "name": "Thể thao & Sở thích",
+    "name_ja": "スポーツ・趣味",
+    "icon": "⚽",
+    "color": "#FFDDA1",
+    "words": [
+      {"vi": "đá bóng", "ja": "サッカー", "emoji": "⚽"},
+      {"vi": "bơi lội", "ja": "水泳", "emoji": "🏊"},
+      {"vi": "vẽ tranh", "ja": "絵を描く", "emoji": "🎨"},
+      {"vi": "đọc sách", "ja": "読書", "emoji": "📚"},
+      {"vi": "ca hát", "ja": "歌う", "emoji": "🎤"},
+      {"vi": "nhảy múa", "ja": "ダンス", "emoji": "💃"},
+      {"vi": "chơi game", "ja": "ゲーム", "emoji": "🎮"},
+      {"vi": "câu cá", "ja": "釣り", "emoji": "🎣"}
     ]
   }
 ]
