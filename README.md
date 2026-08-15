@@ -14,6 +14,10 @@ build tool, không framework):
 - **Dữ liệu**: [Firebase](https://firebase.google.com) —
   - **Authentication** (email/mật khẩu): phụ huynh đăng nhập 1 lần trên
     thiết bị, sau đó bé tự do chọn hồ sơ và học mà không cần đăng nhập lại.
+    Để đơn giản, người dùng chỉ cần nhập **tên đăng nhập tùy ý + mật khẩu**
+    (không cần email thật) — app tự sinh 1 email nội bộ từ tên đăng nhập để
+    dùng với Firebase Auth bên dưới. Vì vậy **không có tính năng khôi phục
+    mật khẩu qua email** — nhắc phụ huynh ghi nhớ tên đăng nhập/mật khẩu.
   - **Firestore**: lưu hồ sơ bé + tiến trình học (điểm, sao, huy hiệu),
     đồng bộ qua nhiều thiết bị.
 - **Nội dung học** (bảng chữ cái, từ vựng): file JSON tĩnh trong `data/`,

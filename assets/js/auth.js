@@ -1,43 +1,47 @@
-/* Đăng nhập / đăng ký cho phụ huynh bằng Firebase Auth (email + mật khẩu).
-   Sau khi phụ huynh đăng nhập trên 1 thiết bị, bé có thể tự do chọn hồ sơ
-   và chơi mà không cần nhập lại mật khẩu mỗi lần (phiên đăng nhập được
-   trình duyệt ghi nhớ). */
+/* Đăng nhập / đăng ký cho phụ huynh bằng Firebase Auth.
+   Để đơn giản cho phụ huynh (không cần có sẵn email), bé chỉ cần nhập 1
+   "tên đăng nhập" tùy ý + mật khẩu — app tự sinh ra 1 email nội bộ
+   (VD: "me.be" -> "me.be@vietkid.local") để dùng với Firebase Auth
+   Email/Password bên dưới, không hiển thị ra ngoài.
+   Sau khi đăng nhập trên 1 thiết bị, bé có thể tự do chọn hồ sơ và chơi
+   mà không cần nhập lại (phiên đăng nhập được trình duyệt ghi nhớ). */
 import { auth } from "./firebase-init.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  sendPasswordResetEmail,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 export function onAuthChange(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
-export async function signUpParent(email, password) {
-  await createUserWithEmailAndPassword(auth, email, password);
+function usernameToEmail(username) {
+  let s = (username || "").trim().toLowerCase().replace(/đ/g, "d");
+  s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  s = s.replace(/\s+/g, ".").replace(/[^a-z0-9._-]/g, "");
+  return (s || "be") + "@vietkid.local";
 }
 
-export async function signInParent(email, password) {
-  await signInWithEmailAndPassword(auth, email, password);
+export async function signUpParent(username, password) {
+  await createUserWithEmailAndPassword(auth, usernameToEmail(username), password);
+}
+
+export async function signInParent(username, password) {
+  await signInWithEmailAndPassword(auth, usernameToEmail(username), password);
 }
 
 export async function signOutParent() {
   await signOut(auth);
 }
 
-export async function resetPassword(email) {
-  await sendPasswordResetEmail(auth, email);
-}
-
 const ERROR_MESSAGES = {
-  "auth/email-already-in-use": "Email này đã được đăng ký rồi.",
-  "auth/invalid-email": "Email không hợp lệ.",
+  "auth/email-already-in-use": "Tên đăng nhập này đã có người dùng rồi, thử tên khác nhé.",
   "auth/weak-password": "Mật khẩu quá ngắn (cần ít nhất 6 ký tự).",
-  "auth/user-not-found": "Không tìm thấy tài khoản với email này.",
+  "auth/user-not-found": "Không tìm thấy tài khoản với tên đăng nhập này.",
   "auth/wrong-password": "Sai mật khẩu.",
-  "auth/invalid-credential": "Email hoặc mật khẩu không đúng.",
+  "auth/invalid-credential": "Tên đăng nhập hoặc mật khẩu không đúng.",
   "auth/too-many-requests": "Bạn thử sai quá nhiều lần, vui lòng thử lại sau.",
   "auth/network-request-failed": "Lỗi kết nối mạng. Vui lòng thử lại.",
   "auth/api-key-not-valid.-please-pass-a-valid-api-key.":
@@ -62,7 +66,7 @@ export function renderAuthGate(container) {
             ? "Phụ huynh đăng nhập để xem tiến trình học của bé"
             : "Tạo tài khoản để bắt đầu học cùng bé"
         }</p>
-        <input id="auth-email" class="text-input" type="email" autocomplete="email" placeholder="Email" style="margin-bottom:10px;">
+        <input id="auth-username" class="text-input" type="text" autocomplete="username" placeholder="Tên đăng nhập (tùy ý)" style="margin-bottom:10px;">
         <input id="auth-password" class="text-input" type="password" autocomplete="${
           mode === "signin" ? "current-password" : "new-password"
         }" placeholder="Mật khẩu (ít nhất 6 ký tự)" style="margin-bottom:10px;">
@@ -77,7 +81,11 @@ export function renderAuthGate(container) {
               : 'Đã có tài khoản? <a href="#" id="auth-switch">Đăng nhập</a>'
           }
         </p>
-        ${mode === "signin" ? '<p style="text-align:center;"><a href="#" id="auth-forgot">Quên mật khẩu?</a></p>' : ""}
+        ${
+          mode === "signup"
+            ? '<p class="page-subtitle" style="margin-top:4px;">⚠️ Không có email nên không thể khôi phục mật khẩu — bạn nhớ ghi lại tên đăng nhập và mật khẩu nhé!</p>'
+            : ""
+        }
       </div>`;
 
     document.getElementById("auth-switch").addEventListener("click", (e) => {
@@ -86,19 +94,24 @@ export function renderAuthGate(container) {
       render();
     });
 
-    const emailInput = document.getElementById("auth-email");
+    const usernameInput = document.getElementById("auth-username");
     const passwordInput = document.getElementById("auth-password");
     const submitBtn = document.getElementById("auth-submit");
     const errorEl = document.getElementById("auth-error");
 
     async function submit() {
-      const email = emailInput.value.trim();
+      const username = usernameInput.value.trim();
       const password = passwordInput.value;
       errorEl.style.display = "none";
+      if (!username) {
+        errorEl.textContent = "Vui lòng nhập tên đăng nhập.";
+        errorEl.style.display = "block";
+        return;
+      }
       submitBtn.disabled = true;
       try {
-        if (mode === "signin") await signInParent(email, password);
-        else await signUpParent(email, password);
+        if (mode === "signin") await signInParent(username, password);
+        else await signUpParent(username, password);
       } catch (err) {
         errorEl.textContent = authErrorMessage(err);
         errorEl.style.display = "block";
@@ -111,24 +124,6 @@ export function renderAuthGate(container) {
     passwordInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") submit();
     });
-
-    const forgotLink = document.getElementById("auth-forgot");
-    if (forgotLink) {
-      forgotLink.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const email = emailInput.value.trim();
-        if (!email) {
-          alert("Bạn nhập email trước rồi bấm Quên mật khẩu nhé.");
-          return;
-        }
-        try {
-          await resetPassword(email);
-          alert("Đã gửi email đặt lại mật khẩu, vui lòng kiểm tra hộp thư!");
-        } catch (err) {
-          alert(authErrorMessage(err));
-        }
-      });
-    }
   }
 
   render();
