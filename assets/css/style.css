@@ -513,6 +513,41 @@ main {
 .letter-back .ja { color: var(--text-soft); font-size: 0.75rem; }
 
 /* ---------------------------------------------------------------------- */
+/* Tìm chữ cái (letter hunt)                                              */
+/* ---------------------------------------------------------------------- */
+.hunt-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.hunt-tile {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  border: 3px solid #f7dcee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-family: 'Baloo 2', sans-serif;
+  box-shadow: var(--shadow);
+  transition: transform 0.12s ease;
+}
+
+.hunt-tile:hover { border-color: var(--pink); transform: translateY(-2px); }
+.hunt-tile.found { background: var(--green); color: #fff; border-color: var(--green); cursor: default; }
+.hunt-tile.wrong { animation: shake 0.4s; border-color: var(--red); }
+
+@media (max-width: 640px) {
+  .hunt-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .hunt-tile { font-size: 1.3rem; }
+}
+
+/* ---------------------------------------------------------------------- */
 /* Tập viết chữ (writing practice)                                       */
 /* ---------------------------------------------------------------------- */
 .writing-select-grid {

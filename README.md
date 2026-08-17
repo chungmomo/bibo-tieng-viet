@@ -117,16 +117,20 @@ Muốn thêm avatar cho hồ sơ bé? Sửa mảng `AVATARS` ở đầu file
 
 ## Tính năng
 
-- **Đăng nhập phụ huynh** (Firebase Auth) + nhiều hồ sơ bé/gia đình, đồng
-  bộ qua Firestore trên mọi thiết bị.
+- **Đăng nhập phụ huynh** (tên đăng nhập tùy ý + mật khẩu, không cần
+  email) + nhiều hồ sơ bé/gia đình, đồng bộ qua Firestore trên mọi thiết bị.
 - **Bảng chữ cái tiếng Việt**: 29 chữ cái, lật thẻ xem ví dụ + nghe phát âm.
+- **🔍 Tìm chữ cái**: bấm chọn hết các ô chứa đúng chữ cái mục tiêu giữa
+  các chữ dễ nhầm lẫn (a/ă/â, o/ô/ơ...) — luyện nhận diện mặt chữ.
 - **✍️ Tập viết chữ**: tô theo hình chữ mờ trên canvas, tự động chấm điểm
   theo độ phủ và cho sao.
-- **Từ vựng theo 11 chủ đề**: Gia đình, Con vật, Màu sắc, Số đếm, Đồ ăn,
-  Trường học, Cơ thể, Thời tiết, Cảm xúc, Phương tiện, Nghề nghiệp.
-- **3 trò chơi** cho mỗi chủ đề: 🧩 Nối cặp, ❓ Đố vui trắc nghiệm, 🔡 Ghép
-  chữ thành từ.
+- **Từ vựng theo 14 chủ đề**: Gia đình, Con vật, Màu sắc, Số đếm, Đồ ăn,
+  Trường học, Cơ thể, Thời tiết, Cảm xúc, Phương tiện, Nghề nghiệp, Thiên
+  nhiên, Đồ dùng trong nhà, Thể thao & Sở thích (147 từ song ngữ Việt-Nhật).
+- **4 trò chơi** cho mỗi chủ đề: 🧩 Nối cặp, ❓ Đố vui trắc nghiệm, 🔡 Ghép
+  chữ thành từ, 👂 Nghe và đoán.
 - **Sao ⭐ + huy hiệu 🎖️**, trang **Thành tích** tổng hợp tiến trình.
+- **Rồng Con 🐉**: linh vật động viên bé trên trang chủ.
 - Giao diện rực rỡ, chữ to, hoạt hình bo tròn, confetti + âm thanh khen
   thưởng — phù hợp tâm lý trẻ nhỏ; responsive cho điện thoại/tablet/PC.
 
