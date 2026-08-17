@@ -1,8 +1,9 @@
 /* Lưu trữ hồ sơ bé + tiến trình học bằng Firestore (thay cho SQLite).
    Cấu trúc dữ liệu:
-     users/{uid}/profiles/{profileId}                        {name, avatar, createdAt}
-     users/{uid}/profiles/{profileId}/progress/{topicId_gameType}     {topicId, gameType, score, stars, updatedAt}
-     users/{uid}/profiles/{profileId}/writingProgress/{letterIndex}   {letterIndex, score, stars, updatedAt}
+     users/{uid}/profiles/{profileId}                          {name, avatar, createdAt}
+     users/{uid}/profiles/{profileId}/progress/{topicId_gameType}       {topicId, gameType, score, stars, updatedAt}
+     users/{uid}/profiles/{profileId}/writingProgress/{letterIndex}     {letterIndex, score, stars, updatedAt}
+     users/{uid}/profiles/{profileId}/letterHuntProgress/{letterIndex} {letterIndex, score, stars, updatedAt}
    Quyền đọc/ghi chỉ dành cho chính phụ huynh (uid == request.auth.uid) — xem firestore.rules. */
 import { db } from "./firebase-init.js";
 import {
@@ -38,6 +39,9 @@ function progressCol(uid, profileId) {
 function writingCol(uid, profileId) {
   return collection(db, "users", uid, "profiles", profileId, "writingProgress");
 }
+function letterHuntCol(uid, profileId) {
+  return collection(db, "users", uid, "profiles", profileId, "letterHuntProgress");
+}
 
 export async function createProfile(uid, name, avatar) {
   name = (name || "").trim();
@@ -67,13 +71,15 @@ export async function getProfile(uid, profileId) {
 }
 
 export async function deleteProfile(uid, profileId) {
-  const [progressSnap, writingSnap] = await Promise.all([
+  const [progressSnap, writingSnap, huntSnap] = await Promise.all([
     getDocs(progressCol(uid, profileId)),
     getDocs(writingCol(uid, profileId)),
+    getDocs(letterHuntCol(uid, profileId)),
   ]);
   const batch = writeBatch(db);
   progressSnap.forEach((d) => batch.delete(d.ref));
   writingSnap.forEach((d) => batch.delete(d.ref));
+  huntSnap.forEach((d) => batch.delete(d.ref));
   batch.delete(profileDoc(uid, profileId));
   await batch.commit();
 }
@@ -100,11 +106,23 @@ export async function saveWritingProgress(uid, profileId, letterIndex, score, st
   return computeSummary(uid, profileId);
 }
 
+export async function saveLetterHuntProgress(uid, profileId, letterIndex, score, stars) {
+  stars = Math.max(0, Math.min(MAX_STARS_PER_GAME, Math.round(stars)));
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const ref = doc(letterHuntCol(uid, profileId), String(letterIndex));
+  const existing = await getDoc(ref);
+  const bestScore = existing.exists() ? Math.max(existing.data().score, score) : score;
+  const bestStars = existing.exists() ? Math.max(existing.data().stars, stars) : stars;
+  await setDoc(ref, { letterIndex, score: bestScore, stars: bestStars, updatedAt: serverTimestamp() });
+  return computeSummary(uid, profileId);
+}
+
 export async function computeSummary(uid, profileId) {
   const { alphabet, vocabulary } = await getContent();
-  const [progressSnap, writingSnap] = await Promise.all([
+  const [progressSnap, writingSnap, huntSnap] = await Promise.all([
     getDocs(progressCol(uid, profileId)),
     getDocs(writingCol(uid, profileId)),
+    getDocs(letterHuntCol(uid, profileId)),
   ]);
 
   const byTopic = {};
@@ -151,7 +169,25 @@ export async function computeSummary(uid, profileId) {
     if (writingPracticedCount >= threshold) badges.push({ id: "writing_" + threshold, icon, label });
   });
 
-  const totalStars = vocabStars + writingStars;
+  const huntLetters = {};
+  let huntStars = 0;
+  huntSnap.forEach((d) => {
+    const r = d.data();
+    huntStars += r.stars;
+    huntLetters[r.letterIndex] = { score: r.score, stars: r.stars };
+  });
+  const huntPracticedCount = Object.keys(huntLetters).length;
+
+  const huntMilestones = [
+    [5, "🔍", "Thám tử chữ cái nhí"],
+    [15, "🕵️", "Thám tử chữ cái cừ khôi"],
+    [alphabet.length, "🏅", "Bậc thầy nhận diện chữ"],
+  ];
+  huntMilestones.forEach(([threshold, icon, label]) => {
+    if (huntPracticedCount >= threshold) badges.push({ id: "hunt_" + threshold, icon, label });
+  });
+
+  const totalStars = vocabStars + writingStars + huntStars;
   MILESTONE_BADGES.forEach(([threshold, icon, label]) => {
     if (totalStars >= threshold) badges.push({ id: "milestone_" + threshold, icon, label });
   });
@@ -164,6 +200,13 @@ export async function computeSummary(uid, profileId) {
       practiced_count: writingPracticedCount,
       total_letters: alphabet.length,
       stars: writingStars,
+      max_stars: alphabet.length * MAX_STARS_PER_GAME,
+    },
+    letterHunt: {
+      letters: huntLetters,
+      practiced_count: huntPracticedCount,
+      total_letters: alphabet.length,
+      stars: huntStars,
       max_stars: alphabet.length * MAX_STARS_PER_GAME,
     },
     badges,

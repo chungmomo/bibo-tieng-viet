@@ -102,6 +102,8 @@ async function route() {
   await renderHeader();
   if (parts.length === 0) return renderHome();
   if (parts[0] === "alphabet") return renderAlphabet();
+  if (parts[0] === "letter-hunt" && parts.length === 1) return renderLetterHuntList();
+  if (parts[0] === "letter-hunt" && parts.length === 2) return renderLetterHuntGame(parts[1]);
   if (parts[0] === "writing" && parts.length === 1) return renderWritingList();
   if (parts[0] === "writing" && parts.length === 2) return renderWritingPractice(parts[1]);
   if (parts[0] === "topics" && parts.length === 1) return renderTopics();
@@ -321,7 +323,7 @@ function renderDashboard(profile) {
     '  <a class="quick-link-card" href="#/alphabet"><span class="icon">🔤</span><div class="title">Bảng chữ cái</div><div class="desc">Học 29 chữ cái tiếng Việt</div></a>' +
     '  <a class="quick-link-card" href="#/writing"><span class="icon">✍️</span><div class="title">Tập viết</div><div class="desc">Tô theo hình chữ mờ</div></a>' +
     '  <a class="quick-link-card" href="#/topics"><span class="icon">📚</span><div class="title">Từ vựng</div><div class="desc">Nhiều chủ đề thú vị</div></a>' +
-    '  <a class="quick-link-card" href="#/topics"><span class="icon">🎮</span><div class="title">Trò chơi</div><div class="desc">Nối cặp, đố vui, ghép chữ</div></a>' +
+    '  <a class="quick-link-card" href="#/letter-hunt"><span class="icon">🔍</span><div class="title">Tìm chữ cái</div><div class="desc">Bấm đúng hết chữ giống nhau</div></a>' +
     '  <a class="quick-link-card" href="#/progress"><span class="icon">🏆</span><div class="title">Thành tích</div><div class="desc">Xem sao và huy hiệu của bé</div></a>' +
     '</div>' +
     '<div style="text-align:center;"><button class="btn btn-outline" id="switch-profile-btn">🔄 Đổi hồ sơ khác</button></div>' +
@@ -350,6 +352,7 @@ function renderAlphabet() {
   app.innerHTML =
     '<h1 class="page-title">Bảng chữ cái tiếng Việt 🔤</h1>' +
     '<p class="page-subtitle">Chạm vào từng chữ để nghe cách đọc nhé!</p>' +
+    '<div style="text-align:center; margin-bottom:20px;"><a class="btn btn-primary" href="#/letter-hunt">🔍 Chơi tìm chữ cái</a></div>' +
     '<div id="alphabet-grid" class="alphabet-grid"></div>';
 
   const grid = document.getElementById("alphabet-grid");
@@ -373,6 +376,159 @@ function renderAlphabet() {
     });
     grid.appendChild(card);
   });
+}
+
+/* ==========================================================================
+   2b. TÌM CHỮ CÁI (nhận diện chữ giữa các chữ giống nhau)
+   ========================================================================== */
+async function renderLetterHuntList() {
+  app.innerHTML =
+    '<h1 class="page-title">🔍 Bé tìm chữ cái</h1>' +
+    '<p class="page-subtitle">Chọn 1 chữ cái, rồi bấm hết các ô có đúng chữ đó giữa các chữ trông giống nhau nhé!</p>' +
+    '<div class="writing-select-grid" id="hunt-list-grid"></div>';
+
+  const grid = document.getElementById("hunt-list-grid");
+  const profileId = Store.getCurrentProfileId(currentUser.uid);
+  const summary = profileId ? await Store.computeSummary(currentUser.uid, profileId) : null;
+
+  content.alphabet.forEach((item, idx) => {
+    const a = document.createElement("a");
+    a.className = "writing-select-card";
+    a.href = "#/letter-hunt/" + idx;
+    let starsText = "";
+    if (summary && summary.letterHunt.letters[idx]) {
+      starsText = "⭐".repeat(summary.letterHunt.letters[idx].stars);
+    }
+    a.innerHTML = '<span class="letter">' + item.letter + '</span><span class="stars">' + starsText + '</span>';
+    grid.appendChild(a);
+  });
+}
+
+const HUNT_GRID_SIZE = 24;
+
+function buildHuntCells(letterIndex) {
+  const target = content.alphabet[letterIndex];
+  const others = content.alphabet.filter((_, i) => i !== letterIndex);
+  const sameType = others.filter((a) => a.type === target.type).map((a) => a.letter);
+  const otherType = others.filter((a) => a.type !== target.type).map((a) => a.letter);
+
+  const targetCount = 5 + Math.floor(Math.random() * 3); // 5–7
+  const cells = new Array(targetCount).fill(target.letter);
+  for (let i = targetCount; i < HUNT_GRID_SIZE; i++) {
+    const useSame = sameType.length > 0 && Math.random() < 0.7;
+    const pool = useSame ? sameType : otherType.length ? otherType : sameType;
+    cells.push(pool[Math.floor(Math.random() * pool.length)]);
+  }
+  return { cells: shuffle(cells), targetCount };
+}
+
+async function renderLetterHuntGame(idxParam) {
+  const letterIndex = parseInt(idxParam, 10);
+  if (isNaN(letterIndex) || letterIndex < 0 || letterIndex >= content.alphabet.length) return renderNotFound();
+  if (!requireProfile()) return;
+
+  const letter = content.alphabet[letterIndex];
+  const total = content.alphabet.length;
+  const prevLink = letterIndex > 0 ? '<a class="btn" href="#/letter-hunt/' + (letterIndex - 1) + '">⬅️ Chữ trước</a>' : "<span></span>";
+  const nextLink = letterIndex < total - 1 ? '<a class="btn" href="#/letter-hunt/' + (letterIndex + 1) + '">Chữ tiếp ➡️</a>' : "";
+  const nextModalLink = letterIndex < total - 1
+    ? '<a class="btn btn-green" href="#/letter-hunt/' + (letterIndex + 1) + '">➡️ Chữ tiếp theo</a>'
+    : "";
+
+  app.innerHTML =
+    '<h1 class="page-title">🔍 Tìm chữ "' + letter.letter + '"</h1>' +
+    '<p class="page-subtitle">Bấm vào tất cả ô có đúng chữ "' + letter.letter + '" nhé, coi chừng nhầm với chữ khác!</p>' +
+    '<div class="game-header">' +
+    '  <div id="hunt-stats"></div>' +
+    '  <a class="btn btn-outline" href="#/letter-hunt">⬅️ Danh sách chữ</a>' +
+    '</div>' +
+    '<div class="hunt-grid" id="hunt-grid"></div>' +
+    '<div class="writing-nav" style="max-width:520px; margin:20px auto 0;">' + prevLink + nextLink + '</div>' +
+    '<div id="result-modal" class="modal-overlay" style="display:none;">' +
+    '  <div class="modal-box">' +
+    '    <div class="big-emoji" id="modal-emoji">🔍</div>' +
+    '    <h2 id="modal-title">Giỏi quá!</h2>' +
+    '    <div class="stars-earned" id="stars-earned"></div>' +
+    '    <div class="score-text" id="score-text"></div>' +
+    '    <div class="modal-actions">' +
+    '      <button class="btn btn-primary" id="retry-btn">🔄 Chơi lại</button>' +
+    nextModalLink +
+    '      <a class="btn btn-outline" href="#/letter-hunt">🔍 Danh sách chữ</a>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+
+  let targetCount, foundCount, wrongCount;
+
+  function updateStats() {
+    document.getElementById("hunt-stats").innerHTML =
+      '<div class="game-stat">🔎 Tìm được: ' + foundCount + ' / ' + targetCount + '</div>' +
+      '<div class="game-stat" style="margin-left:8px;">❌ Bấm sai: ' + wrongCount + '</div>';
+  }
+
+  function renderGrid() {
+    const { cells, targetCount: tc } = buildHuntCells(letterIndex);
+    targetCount = tc;
+    foundCount = 0;
+    wrongCount = 0;
+    updateStats();
+
+    const gridEl = document.getElementById("hunt-grid");
+    gridEl.innerHTML = "";
+    cells.forEach((ch) => {
+      const btn = document.createElement("button");
+      btn.className = "hunt-tile";
+      btn.textContent = ch;
+      btn.addEventListener("click", () => onTileClick(btn, ch));
+      gridEl.appendChild(btn);
+    });
+  }
+
+  function onTileClick(btn, ch) {
+    if (btn.classList.contains("found")) return;
+    if (ch === letter.letter) {
+      btn.classList.add("found");
+      foundCount++;
+      updateStats();
+      VietKidSound.playCorrect();
+      if (foundCount === targetCount) setTimeout(finishGame, 400);
+    } else {
+      wrongCount++;
+      updateStats();
+      VietKidSound.playWrong();
+      btn.classList.add("wrong");
+      setTimeout(() => btn.classList.remove("wrong"), 400);
+    }
+  }
+
+  async function finishGame() {
+    let stars;
+    if (wrongCount === 0) stars = 3;
+    else if (wrongCount <= 2) stars = 2;
+    else stars = 1;
+    const score = Math.round((targetCount / (targetCount + wrongCount)) * 100);
+
+    const msg = pickResultMessage(stars);
+    document.getElementById("modal-emoji").textContent = msg.emoji;
+    document.getElementById("modal-title").textContent = msg.title;
+    document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+    document.getElementById("score-text").textContent = "Tìm đúng " + targetCount + "/" + targetCount + " chữ, bấm sai " + wrongCount + " lần!";
+    document.getElementById("result-modal").style.display = "flex";
+    VietKidSound.playCheer();
+    VietKidSound.confettiBurst();
+
+    const profileId = Store.getCurrentProfileId(currentUser.uid);
+    if (profileId) await Store.saveLetterHuntProgress(currentUser.uid, profileId, letterIndex, score, stars);
+    await renderHeader();
+  }
+
+  function resetGame() {
+    document.getElementById("result-modal").style.display = "none";
+    renderGrid();
+  }
+
+  document.getElementById("retry-btn").addEventListener("click", resetGame);
+  renderGrid();
 }
 
 /* ==========================================================================
