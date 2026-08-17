@@ -350,6 +350,7 @@ function renderBadgeChips(badges) {
    ========================================================================== */
 function renderAlphabet() {
   app.innerHTML =
+    '<span class="section-badge">📖 Tập đọc</span>' +
     '<h1 class="page-title">Bảng chữ cái tiếng Việt 🔤</h1>' +
     '<p class="page-subtitle">Chạm vào từng chữ để nghe cách đọc nhé!</p>' +
     '<div style="text-align:center; margin-bottom:20px;"><a class="btn btn-primary" href="#/letter-hunt">🔍 Chơi tìm chữ cái</a></div>' +
@@ -383,6 +384,7 @@ function renderAlphabet() {
    ========================================================================== */
 async function renderLetterHuntList() {
   app.innerHTML =
+    '<span class="section-badge gold">💡 Nhận biết</span>' +
     '<h1 class="page-title">🔍 Bé tìm chữ cái</h1>' +
     '<p class="page-subtitle">Chọn 1 chữ cái, rồi bấm hết các ô có đúng chữ đó giữa các chữ trông giống nhau nhé!</p>' +
     '<div class="writing-select-grid" id="hunt-list-grid"></div>';
@@ -436,13 +438,14 @@ async function renderLetterHuntGame(idxParam) {
     : "";
 
   app.innerHTML =
+    '<span class="section-badge gold">💡 Nhận biết</span>' +
     '<h1 class="page-title">🔍 Tìm chữ "' + letter.letter + '"</h1>' +
     '<p class="page-subtitle">Bấm vào tất cả ô có đúng chữ "' + letter.letter + '" nhé, coi chừng nhầm với chữ khác!</p>' +
     '<div class="game-header">' +
     '  <div id="hunt-stats"></div>' +
     '  <a class="btn btn-outline" href="#/letter-hunt">⬅️ Danh sách chữ</a>' +
     '</div>' +
-    '<div class="hunt-grid" id="hunt-grid"></div>' +
+    '<div class="exercise-panel" style="max-width:580px;"><div class="hunt-grid" id="hunt-grid"></div></div>' +
     '<div class="writing-nav" style="max-width:520px; margin:20px auto 0;">' + prevLink + nextLink + '</div>' +
     '<div id="result-modal" class="modal-overlay" style="display:none;">' +
     '  <div class="modal-box">' +
@@ -536,6 +539,7 @@ async function renderLetterHuntGame(idxParam) {
    ========================================================================== */
 async function renderWritingList() {
   app.innerHTML =
+    '<span class="section-badge accent2">✏️ Tập viết</span>' +
     '<h1 class="page-title">Bé tập viết chữ ✍️</h1>' +
     '<p class="page-subtitle">Chọn 1 chữ cái để tô theo hình mờ nhé!</p>' +
     '<div class="writing-select-grid" id="writing-grid"></div>';
@@ -571,6 +575,7 @@ async function renderWritingPractice(idxParam) {
     : "";
 
   app.innerHTML =
+    '<span class="section-badge accent2">✏️ Tập viết</span>' +
     '<h1 class="page-title">✍️ Tập viết chữ "' + letter.letter + '"</h1>' +
     '<p class="page-subtitle">Dùng ngón tay hoặc chuột tô đầy vào hình chữ mờ bên dưới nhé!</p>' +
     '<div class="game-header">' +
@@ -604,7 +609,7 @@ async function renderWritingPractice(idxParam) {
     '  </div>' +
     '</div>';
 
-  const INK_COLOR = "#e0338f";
+  const INK_COLOR = "#d9642e";
   const DISPLAY_SIZE = Math.min(320, window.innerWidth - 64);
   let guideCtx, inkCtx, dpr, hasInk = false, drawing = false;
 
@@ -621,7 +626,7 @@ async function renderWritingPractice(idxParam) {
 
   function drawGuide() {
     guideCtx.clearRect(0, 0, DISPLAY_SIZE, DISPLAY_SIZE);
-    guideCtx.fillStyle = "rgba(180, 123, 240, 0.32)";
+    guideCtx.fillStyle = "rgba(242, 136, 75, 0.32)";
     guideCtx.font = "700 " + Math.floor(DISPLAY_SIZE * 0.7) + "px 'Baloo 2', sans-serif";
     guideCtx.textAlign = "center";
     guideCtx.textBaseline = "middle";
@@ -754,6 +759,7 @@ async function renderWritingPractice(idxParam) {
    ========================================================================== */
 async function renderTopics() {
   app.innerHTML =
+    '<span class="section-badge">📚 Từ vựng</span>' +
     '<h1 class="page-title">Chọn chủ đề từ vựng 📚</h1>' +
     '<p class="page-subtitle">Mỗi chủ đề có từ mới, thẻ ghi nhớ và trò chơi vui nhộn!</p>' +
     '<div class="topic-grid" id="topic-grid"></div>';
@@ -809,7 +815,7 @@ function renderVocabulary(topicId) {
     '<div class="game-launch-row">' +
     '  <a class="btn btn-primary btn-lg" href="#/games/' + topic.id + '/matching">🧩 Trò chơi nối cặp</a>' +
     '  <a class="btn btn-green btn-lg" href="#/games/' + topic.id + '/quiz">❓ Đố vui</a>' +
-    '  <a class="btn" style="background:var(--lavender); color:#fff;" href="#/games/' + topic.id + '/spelling">🔡 Ghép chữ</a>' +
+    '  <a class="btn" style="background:var(--accent2); color:#fff;" href="#/games/' + topic.id + '/spelling">🔡 Ghép chữ</a>' +
     '  <a class="btn" style="background:var(--blue); color:#fff;" href="#/games/' + topic.id + '/listening">👂 Nghe và đoán</a>' +
     '</div>';
 
@@ -883,7 +889,7 @@ function gameShell(topic, titleIcon, titleText, subtitle, bodyHtml, modalIcon, m
 function renderMatchingGame(topic) {
   gameShell(
     topic, "🧩", "Nối cặp", "Lật 2 thẻ giống nhau (từ và hình) để ghép cặp nhé!",
-    '<div id="grid" class="matching-grid"></div>',
+    '<div class="exercise-panel" style="max-width:680px;"><div id="grid" class="matching-grid"></div></div>',
     "🎉", "Giỏi quá!"
   );
 
@@ -1352,6 +1358,7 @@ async function renderProgress() {
   const masteredCount = topicsEntries.filter(([, info]) => info.mastered).length;
 
   app.innerHTML =
+    '<span class="section-badge gold">🏆 Thành tích</span>' +
     '<h1 class="page-title">🏆 Thành tích của bé</h1>' +
     '<p class="page-subtitle">' + profile.avatar + ' ' + escapeHtml(profile.name) + '</p>' +
     '<div class="progress-summary">' +

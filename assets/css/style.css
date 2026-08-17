@@ -5,24 +5,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap');
 
 :root {
-  --pink: #ff5d9e;
-  --pink-deep: #e0338f;
-  --pink-soft: #ffd6ea;
-  --gold: #ffc857;
-  --gold-deep: #f2a91c;
-  --lavender: #b47bf0;
-  --lilac: #d9b8ff;
-  --red: #ff5c5c;
+  --primary: #f2884b;
+  --primary-deep: #d9642e;
+  --primary-soft: #ffe0c2;
+  --gold: #f6b93b;
+  --gold-deep: #d99423;
+  --accent2: #e0a872;
+  --accent2-soft: #f5e2c8;
+  --red: #f0604a;
   --yellow: #ffc93c;
   --green: #4ecb71;
   --blue: #4fb0ff;
   --purple: #b47bf0;
   --orange: #ff9f43;
-  --bg: #fff5fa;
+  --bg: #fff8f0;
   --card-bg: #ffffff;
-  --text: #4a2e45;
-  --text-soft: #8a6d84;
-  --shadow: 0 6px 0 rgba(224, 51, 143, 0.12);
+  --text: #4a3428;
+  --text-soft: #927a68;
+  --shadow: 0 6px 0 rgba(217, 100, 46, 0.15);
   --radius-lg: 28px;
   --radius-md: 20px;
   --radius-sm: 14px;
@@ -42,14 +42,14 @@ html, body {
 body {
   font-family: 'Quicksand', 'Baloo 2', sans-serif;
   background:
-    radial-gradient(circle at 8% 12%, rgba(255, 214, 234, 0.9) 0%, transparent 38%),
-    radial-gradient(circle at 92% 18%, rgba(217, 184, 255, 0.7) 0%, transparent 42%),
-    radial-gradient(circle at 50% 100%, rgba(255, 200, 87, 0.25) 0%, transparent 55%),
-    radial-gradient(1.5px 1.5px at 15% 25%, #ffb6d9 100%, transparent),
-    radial-gradient(1.5px 1.5px at 80% 15%, #f6c9ff 100%, transparent),
-    radial-gradient(1.5px 1.5px at 60% 45%, #ffe08a 100%, transparent),
-    radial-gradient(1.5px 1.5px at 30% 70%, #ffb6d9 100%, transparent),
-    radial-gradient(1.5px 1.5px at 90% 80%, #d9b8ff 100%, transparent),
+    radial-gradient(circle at 8% 12%, rgba(255, 224, 194, 0.9) 0%, transparent 38%),
+    radial-gradient(circle at 92% 18%, rgba(246, 185, 59, 0.25) 0%, transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(242, 136, 75, 0.2) 0%, transparent 55%),
+    radial-gradient(1.5px 1.5px at 15% 25%, #ffcda0 100%, transparent),
+    radial-gradient(1.5px 1.5px at 80% 15%, #ffe08a 100%, transparent),
+    radial-gradient(1.5px 1.5px at 60% 45%, #ffdca0 100%, transparent),
+    radial-gradient(1.5px 1.5px at 30% 70%, #ffcda0 100%, transparent),
+    radial-gradient(1.5px 1.5px at 90% 80%, #f5e2c8 100%, transparent),
     var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -85,9 +85,9 @@ img, svg { max-width: 100%; }
 /* Header / nav                                                          */
 /* ---------------------------------------------------------------------- */
 .site-header {
-  background: linear-gradient(135deg, var(--pink), var(--lavender));
+  background: linear-gradient(135deg, var(--primary), var(--accent2));
   padding: 14px 0;
-  box-shadow: 0 4px 14px rgba(224, 51, 143, 0.25);
+  box-shadow: 0 4px 14px rgba(217, 100, 46, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -148,7 +148,7 @@ img, svg { max-width: 100%; }
 
 .main-nav a:hover, .main-nav a.active {
   background: #fff;
-  color: var(--pink-deep);
+  color: var(--primary-deep);
   transform: translateY(-2px);
 }
 
@@ -197,6 +197,32 @@ main {
   padding: 0 10px;
 }
 
+/* Nhãn viên thuốc kiểu vở bài tập (VD: "Tập đọc", "Nhận biết", "Tập viết") */
+.section-badge {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 12px;
+  background: var(--primary);
+  color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 8px 22px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+.section-badge.gold { background: var(--gold); }
+.section-badge.accent2 { background: var(--accent2); color: var(--text); }
+
+/* Khung nét đứt bao quanh khu vực luyện tập, gợi nhớ tờ bài tập giấy */
+.exercise-panel {
+  border: 3px dashed var(--primary-soft);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.5);
+  padding: 24px 16px;
+  margin: 0 auto;
+}
+
 .site-footer {
   text-align: center;
   padding: 18px;
@@ -226,10 +252,10 @@ main {
 .btn:active { transform: translateY(4px); box-shadow: none; }
 .btn:hover { transform: translateY(-2px); }
 
-.btn-primary { background: linear-gradient(135deg, var(--pink), var(--lavender)); color: #fff; }
+.btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent2)); color: #fff; }
 .btn-green { background: var(--green); color: #fff; }
 .btn-blue { background: var(--blue); color: #fff; }
-.btn-outline { background: #fff; border: 3px solid var(--lavender); color: var(--lavender); }
+.btn-outline { background: #fff; border: 3px solid var(--primary-deep); color: var(--primary-deep); }
 .btn-lg { padding: 16px 34px; font-size: 1.15rem; }
 .btn-block { width: 100%; justify-content: center; }
 .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
@@ -237,7 +263,7 @@ main {
 /* ---------------------------------------------------------------------- */
 /* Đăng nhập / đăng ký                                                    */
 /* ---------------------------------------------------------------------- */
-.card-panel a { color: var(--pink-deep); font-weight: 700; text-decoration: underline; }
+.card-panel a { color: var(--primary-deep); font-weight: 700; text-decoration: underline; }
 
 /* ---------------------------------------------------------------------- */
 /* Profile select screen                                                  */
@@ -265,7 +291,7 @@ main {
 .profile-card .stars { color: var(--gold-deep); font-weight: 700; font-size: 0.9rem; }
 
 .new-profile-card {
-  border: 3px dashed var(--lavender);
+  border: 3px dashed var(--accent2);
   background: transparent;
   border-radius: var(--radius-md);
   display: flex;
@@ -273,7 +299,7 @@ main {
   align-items: center;
   justify-content: center;
   padding: 18px 10px;
-  color: var(--lavender);
+  color: var(--accent2);
   font-weight: 700;
   gap: 6px;
 }
@@ -295,8 +321,8 @@ main {
 }
 
 .avatar-picker button.selected {
-  background: var(--pink-soft);
-  outline: 3px solid var(--pink);
+  background: var(--primary-soft);
+  outline: 3px solid var(--primary);
   transform: scale(1.1);
 }
 
@@ -304,11 +330,11 @@ main {
   width: 100%;
   padding: 12px 16px;
   border-radius: var(--radius-sm);
-  border: 3px solid #f7dcee;
+  border: 3px solid #f5ddc4;
   font-size: 1.1rem;
   font-family: inherit;
 }
-.text-input:focus { outline: none; border-color: var(--pink); }
+.text-input:focus { outline: none; border-color: var(--primary); }
 
 .card-panel {
   background: var(--card-bg);
@@ -323,7 +349,7 @@ main {
 /* Home dashboard                                                         */
 /* ---------------------------------------------------------------------- */
 .welcome-banner {
-  background: linear-gradient(135deg, var(--pink), var(--gold));
+  background: linear-gradient(135deg, var(--primary), var(--gold));
   border-radius: var(--radius-lg);
   padding: 26px 30px;
   color: #fff;
@@ -424,12 +450,12 @@ main {
   text-align: center;
   box-shadow: var(--shadow);
   transition: transform 0.15s ease;
-  border-top: 8px solid var(--pink);
+  border-top: 8px solid var(--primary);
 }
 
-.quick-link-card:nth-child(2) { border-top-color: var(--lavender); }
+.quick-link-card:nth-child(2) { border-top-color: var(--accent2); }
 .quick-link-card:nth-child(3) { border-top-color: var(--gold); }
-.quick-link-card:nth-child(4) { border-top-color: var(--pink-deep); }
+.quick-link-card:nth-child(4) { border-top-color: var(--primary-deep); }
 
 .quick-link-card:hover { transform: translateY(-6px); }
 .quick-link-card .icon { font-size: 3rem; display: block; margin-bottom: 10px; }
@@ -494,9 +520,11 @@ main {
 }
 
 .letter-front {
-  background: linear-gradient(135deg, var(--pink), var(--lavender));
-  color: #fff;
-  font-size: 2.4rem;
+  background: #fff8ef;
+  color: var(--primary-soft);
+  -webkit-text-stroke: 2.5px var(--primary-deep);
+  paint-order: stroke fill;
+  font-size: 3rem;
   font-weight: 800;
   font-family: 'Baloo 2', sans-serif;
 }
@@ -527,7 +555,7 @@ main {
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
   background: #fff;
-  border: 3px solid #f7dcee;
+  border: 3px solid #f5ddc4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -538,7 +566,7 @@ main {
   transition: transform 0.12s ease;
 }
 
-.hunt-tile:hover { border-color: var(--pink); transform: translateY(-2px); }
+.hunt-tile:hover { border-color: var(--primary); transform: translateY(-2px); }
 .hunt-tile.found { background: var(--green); color: #fff; border-color: var(--green); cursor: default; }
 .hunt-tile.wrong { animation: shake 0.4s; border-color: var(--red); }
 
@@ -557,7 +585,7 @@ main {
 }
 
 .writing-select-card {
-  background: linear-gradient(135deg, var(--pink), var(--lavender));
+  background: linear-gradient(135deg, var(--primary), var(--accent2));
   border-radius: var(--radius-md);
   box-shadow: var(--shadow);
   color: #fff;
@@ -686,12 +714,12 @@ main {
   padding: 20px;
 }
 
-.flashcard-front { background: linear-gradient(160deg, #fff, var(--pink-soft)); }
+.flashcard-front { background: linear-gradient(160deg, #fff, var(--primary-soft)); }
 .flashcard-front .emoji { font-size: 5rem; }
 .flashcard-front .vi { font-size: 2rem; font-weight: 800; font-family: 'Baloo 2', sans-serif; margin-top: 10px; }
 
 .flashcard-back {
-  background: linear-gradient(160deg, var(--pink), var(--lavender));
+  background: linear-gradient(160deg, var(--primary), var(--accent2));
   color: #fff;
   transform: rotateY(180deg);
 }
@@ -714,9 +742,9 @@ main {
   flex-wrap: wrap;
 }
 .flashcard-dots span {
-  width: 10px; height: 10px; border-radius: 50%; background: #f7dcee;
+  width: 10px; height: 10px; border-radius: 50%; background: #f5ddc4;
 }
-.flashcard-dots span.active { background: var(--pink); }
+.flashcard-dots span.active { background: var(--primary); }
 
 .sound-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
 
@@ -761,7 +789,7 @@ main {
 .match-card {
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--lavender), var(--pink));
+  background: linear-gradient(135deg, var(--accent2), var(--primary));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -792,7 +820,7 @@ main {
   box-shadow: var(--shadow);
 }
 .quiz-prompt .emoji-big { font-size: 5rem; }
-.quiz-prompt .ja-text { font-size: 1.8rem; font-weight: 700; color: var(--pink-deep); }
+.quiz-prompt .ja-text { font-size: 1.8rem; font-weight: 700; color: var(--primary-deep); }
 
 .quiz-options {
   display: grid;
@@ -804,7 +832,7 @@ main {
 
 .quiz-option {
   background: #fff;
-  border: 3px solid #f7dcee;
+  border: 3px solid #f5ddc4;
   border-radius: var(--radius-md);
   padding: 18px;
   font-weight: 700;
@@ -814,7 +842,7 @@ main {
   min-height: 44px;
 }
 
-.quiz-option:hover { border-color: var(--pink); }
+.quiz-option:hover { border-color: var(--primary); }
 .quiz-option.correct { background: var(--green); color: #fff; border-color: var(--green); }
 .quiz-option.incorrect { background: var(--red); color: #fff; border-color: var(--red); }
 
@@ -842,7 +870,7 @@ main {
 .spelling-slot {
   width: 46px;
   height: 54px;
-  border-bottom: 4px solid var(--lavender);
+  border-bottom: 4px solid var(--accent2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -881,7 +909,7 @@ main {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(74, 46, 69, 0.55);
+  background: rgba(74, 52, 40, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -923,7 +951,7 @@ main {
   text-align: center;
   box-shadow: var(--shadow);
 }
-.progress-stat .num { font-size: 2rem; font-weight: 800; color: var(--pink-deep); }
+.progress-stat .num { font-size: 2rem; font-weight: 800; color: var(--primary-deep); }
 .progress-stat .label { color: var(--text-soft); font-weight: 700; }
 
 .progress-topic {
@@ -941,7 +969,7 @@ main {
 .progress-topic .info { flex: 1; min-width: 140px; }
 .progress-topic .name { font-weight: 800; }
 .progress-bar-track {
-  background: #fbe8f2;
+  background: #fbe9d9;
   border-radius: 999px;
   height: 14px;
   overflow: hidden;
@@ -949,7 +977,7 @@ main {
 }
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--pink), var(--gold));
+  background: linear-gradient(90deg, var(--primary), var(--gold));
   border-radius: 999px;
   transition: width 0.4s ease;
 }
