@@ -8,10 +8,10 @@
    Nhớ bật Authentication (Email/Password) và tạo Firestore Database trước
    khi dùng — xem hướng dẫn trong README.md. */
 export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyAv-xYVlV6diCwVgHxtyejzHDJGU7sysmg",
+  authDomain: "bibo-tieng-viet.firebaseapp.com",
+  projectId: "bibo-tieng-viet",
+  storageBucket: "bibo-tieng-viet.firebasestorage.app",
+  messagingSenderId: "901087425442",
+  appId: "1:901087425442:web:4f067707c0e27ce22db8fb",
 };
