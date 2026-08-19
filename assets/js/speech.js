@@ -1,4 +1,36 @@
-/* Phát âm bằng Web Speech API có sẵn trong trình duyệt (giọng vi-VN / ja-JP). */
+/* Phát âm bằng giọng Google Translate (chất lượng ổn định, giống nhau
+   trên mọi máy/trình duyệt, không phụ thuộc giọng đã cài sẵn của hệ
+   điều hành). Đây là endpoint không chính thức của Google Translate nên
+   không đảm bảo 100% — nếu tải lỗi (mất mạng, bị chặn...), tự động
+   chuyển sang giọng có sẵn của trình duyệt (Web Speech API) để bé vẫn
+   nghe được. */
+const GOOGLE_TTS_LANG = { "vi-VN": "vi", "ja-JP": "ja" };
+const audioEl = new Audio();
+
+function speakViaGoogleTranslate(text, lang) {
+  const playPromise = new Promise((resolve, reject) => {
+    const tl = GOOGLE_TTS_LANG[lang] || lang;
+    const url =
+      "https://translate.google.com/translate_tts?ie=UTF-8&q=" +
+      encodeURIComponent(text) +
+      "&tl=" + tl + "&client=tw-ob";
+
+    audioEl.pause();
+    audioEl.onended = null;
+    audioEl.onerror = null;
+    audioEl.src = url;
+    audioEl.onended = resolve;
+    audioEl.onerror = () => reject(new Error("google-tts-failed"));
+    audioEl.play().catch(reject);
+  });
+
+  // Đây là endpoint không chính thức — nếu bị chặn/chậm, đừng để bé chờ
+  // lâu mới nghe được giọng dự phòng.
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("google-tts-timeout")), 3000));
+  return Promise.race([playPromise, timeout]);
+}
+
+/* ---- Dự phòng: giọng có sẵn của trình duyệt (Web Speech API) ---- */
 let voices = [];
 function loadVoices() {
   if ("speechSynthesis" in window) voices = window.speechSynthesis.getVoices();
@@ -8,9 +40,6 @@ if ("speechSynthesis" in window) {
   window.speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-/* Giọng "Google" (VD: "Google Tiếng Việt", "Google 日本語") nghe tự nhiên
-   hơn hẳn giọng mặc định của hệ điều hành — ưu tiên chọn giọng này nếu
-   trình duyệt có (Chrome/Edge trên máy có kết nối mạng). */
 function isGoogleVoice(v) {
   return /google/i.test(v.name) || /google/i.test(v.voiceURI || "");
 }
@@ -29,7 +58,7 @@ function pickVoice(lang) {
   );
 }
 
-function speak(text, lang) {
+function speakViaBrowserVoice(text, lang) {
   if (!("speechSynthesis" in window) || !text) return;
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
@@ -39,6 +68,11 @@ function speak(text, lang) {
   const voice = pickVoice(lang);
   if (voice) utter.voice = voice;
   window.speechSynthesis.speak(utter);
+}
+
+function speak(text, lang) {
+  if (!text) return;
+  speakViaGoogleTranslate(text, lang).catch(() => speakViaBrowserVoice(text, lang));
 }
 
 export const VietKidSpeech = {
