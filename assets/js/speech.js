@@ -7,26 +7,34 @@
 const GOOGLE_TTS_LANG = { "vi-VN": "vi", "ja-JP": "ja" };
 const audioEl = new Audio();
 
-function speakViaGoogleTranslate(text, lang) {
-  const playPromise = new Promise((resolve, reject) => {
-    const tl = GOOGLE_TTS_LANG[lang] || lang;
-    const url =
-      "https://translate.google.com/translate_tts?ie=UTF-8&q=" +
-      encodeURIComponent(text) +
-      "&tl=" + tl + "&client=tw-ob";
+/* Nhớ lại URL đã phát thành công cho mỗi (giọng, từ) — tránh gọi lại
+   Google mỗi lần bé bấm nghe lại cùng 1 từ (nhanh hơn + đỡ bị giới hạn
+   tần suất vì đây là endpoint không chính thức). */
+const knownGoodCache = new Set();
 
+function speakViaGoogleTranslate(text, lang) {
+  const tl = GOOGLE_TTS_LANG[lang] || lang;
+  const url =
+    "https://translate.google.com/translate_tts?ie=UTF-8&q=" +
+    encodeURIComponent(text) +
+    "&tl=" + tl + "&client=tw-ob";
+  const cacheKey = tl + ":" + text;
+
+  const playPromise = new Promise((resolve, reject) => {
     audioEl.pause();
     audioEl.onended = null;
     audioEl.onerror = null;
     audioEl.src = url;
     audioEl.onended = resolve;
     audioEl.onerror = () => reject(new Error("google-tts-failed"));
-    audioEl.play().catch(reject);
+    audioEl.play().then(() => knownGoodCache.add(cacheKey)).catch(reject);
   });
 
   // Đây là endpoint không chính thức — nếu bị chặn/chậm, đừng để bé chờ
-  // lâu mới nghe được giọng dự phòng.
-  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("google-tts-timeout")), 3000));
+  // lâu mới nghe được giọng dự phòng. Từ đã từng phát được thì cho thêm
+  // thời gian chờ (khả năng cao sẽ phát được lại), từ mới thì fail nhanh.
+  const timeoutMs = knownGoodCache.has(cacheKey) ? 4000 : 2000;
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("google-tts-timeout")), timeoutMs));
   return Promise.race([playPromise, timeout]);
 }
 
