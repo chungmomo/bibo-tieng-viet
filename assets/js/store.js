@@ -1,9 +1,11 @@
 /* Lưu trữ hồ sơ bé + tiến trình học bằng Firestore (thay cho SQLite).
    Cấu trúc dữ liệu:
-     users/{uid}/profiles/{profileId}                          {name, avatar, createdAt}
+     users/{uid}/profiles/{profileId}                          {name, avatar, createdAt, toneQuiz?}
      users/{uid}/profiles/{profileId}/progress/{topicId_gameType}       {topicId, gameType, score, stars, updatedAt}
      users/{uid}/profiles/{profileId}/writingProgress/{letterIndex}     {letterIndex, score, stars, updatedAt}
      users/{uid}/profiles/{profileId}/letterHuntProgress/{letterIndex} {letterIndex, score, stars, updatedAt}
+   `toneQuiz` là 1 field trên chính profile doc (không phải subcollection) vì
+   trò chơi đoán dấu thanh chỉ có 1 điểm số duy nhất, không tách theo từng chữ.
    Quyền đọc/ghi chỉ dành cho chính phụ huynh (uid == request.auth.uid) — xem firestore.rules. */
 import { db } from "./firebase-init.js";
 import {
@@ -117,12 +119,25 @@ export async function saveLetterHuntProgress(uid, profileId, letterIndex, score,
   return computeSummary(uid, profileId);
 }
 
+export async function saveToneProgress(uid, profileId, score, stars) {
+  stars = Math.max(0, Math.min(MAX_STARS_PER_GAME, Math.round(stars)));
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const ref = profileDoc(uid, profileId);
+  const existing = await getDoc(ref);
+  const prev = existing.exists() ? existing.data().toneQuiz : null;
+  const bestScore = prev ? Math.max(prev.score, score) : score;
+  const bestStars = prev ? Math.max(prev.stars, stars) : stars;
+  await setDoc(ref, { toneQuiz: { score: bestScore, stars: bestStars, updatedAt: serverTimestamp() } }, { merge: true });
+  return computeSummary(uid, profileId);
+}
+
 export async function computeSummary(uid, profileId) {
   const { alphabet, vocabulary } = await getContent();
-  const [progressSnap, writingSnap, huntSnap] = await Promise.all([
+  const [progressSnap, writingSnap, huntSnap, profileSnap] = await Promise.all([
     getDocs(progressCol(uid, profileId)),
     getDocs(writingCol(uid, profileId)),
     getDocs(letterHuntCol(uid, profileId)),
+    getDoc(profileDoc(uid, profileId)),
   ]);
 
   const byTopic = {};
@@ -187,7 +202,13 @@ export async function computeSummary(uid, profileId) {
     if (huntPracticedCount >= threshold) badges.push({ id: "hunt_" + threshold, icon, label });
   });
 
-  const totalStars = vocabStars + writingStars + huntStars;
+  const toneQuiz = profileSnap.exists() ? profileSnap.data().toneQuiz : null;
+  const toneStars = toneQuiz ? toneQuiz.stars : 0;
+  if (toneQuiz && toneQuiz.stars >= 3) {
+    badges.push({ id: "tone_master", icon: "🎵", label: "Bậc thầy dấu thanh" });
+  }
+
+  const totalStars = vocabStars + writingStars + huntStars + toneStars;
   MILESTONE_BADGES.forEach(([threshold, icon, label]) => {
     if (totalStars >= threshold) badges.push({ id: "milestone_" + threshold, icon, label });
   });
@@ -208,6 +229,11 @@ export async function computeSummary(uid, profileId) {
       total_letters: alphabet.length,
       stars: huntStars,
       max_stars: alphabet.length * MAX_STARS_PER_GAME,
+    },
+    tones: {
+      score: toneQuiz ? toneQuiz.score : 0,
+      stars: toneStars,
+      max_stars: MAX_STARS_PER_GAME,
     },
     badges,
   };

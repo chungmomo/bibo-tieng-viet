@@ -27,5 +27,16 @@
   {"letter": "ư", "word": "ướt", "ja": "濡れた", "emoji": "💧", "type": "vowel"},
   {"letter": "v", "word": "voi", "ja": "ぞう", "emoji": "🐘", "type": "consonant"},
   {"letter": "x", "word": "xe đạp", "ja": "自転車", "emoji": "🚲", "type": "consonant"},
-  {"letter": "y", "word": "yêu", "ja": "大好き", "emoji": "❤️", "type": "vowel"}
+  {"letter": "y", "word": "yêu", "ja": "大好き", "emoji": "❤️", "type": "vowel"},
+  {"letter": "ch", "word": "chó", "ja": "犬", "emoji": "🐶", "type": "digraph"},
+  {"letter": "gh", "word": "ghế", "ja": "椅子", "emoji": "🪑", "type": "digraph"},
+  {"letter": "gi", "word": "giày", "ja": "靴", "emoji": "👟", "type": "digraph"},
+  {"letter": "kh", "word": "khỉ", "ja": "サル", "emoji": "🐵", "type": "digraph"},
+  {"letter": "ng", "word": "ngô", "ja": "とうもろこし", "emoji": "🌽", "type": "digraph"},
+  {"letter": "ngh", "word": "nghé", "ja": "子水牛", "emoji": "🐃", "type": "digraph"},
+  {"letter": "nh", "word": "nho", "ja": "ぶどう", "emoji": "🍇", "type": "digraph"},
+  {"letter": "ph", "word": "phở", "ja": "フォー", "emoji": "🍜", "type": "digraph"},
+  {"letter": "qu", "word": "quà", "ja": "プレゼント", "emoji": "🎁", "type": "digraph"},
+  {"letter": "th", "word": "thỏ", "ja": "うさぎ", "emoji": "🐰", "type": "digraph"},
+  {"letter": "tr", "word": "trăng", "ja": "月", "emoji": "🌙", "type": "digraph"}
 ]
