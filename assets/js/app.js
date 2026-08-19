@@ -108,6 +108,7 @@ async function route() {
   if (parts[0] === "writing" && parts.length === 2) return renderWritingPractice(parts[1]);
   if (parts[0] === "tones" && parts.length === 1) return renderTonesIntro();
   if (parts[0] === "tones" && parts.length === 2 && parts[1] === "quiz") return renderTonesQuiz();
+  if (parts[0] === "case-match") return renderCaseMatchGame();
   if (parts[0] === "topics" && parts.length === 1) return renderTopics();
   if (parts[0] === "topics" && parts.length === 2) return renderVocabulary(parts[1]);
   if (parts[0] === "games" && parts.length === 3) return renderGame(parts[1], parts[2]);
@@ -325,6 +326,7 @@ function renderDashboard(profile) {
     '  <a class="quick-link-card" href="#/alphabet"><span class="icon">🔤</span><div class="title">Bảng chữ cái</div><div class="desc">29 chữ đơn + 11 chữ ghép</div></a>' +
     '  <a class="quick-link-card" href="#/writing"><span class="icon">✍️</span><div class="title">Tập viết</div><div class="desc">Tô theo hình chữ mờ</div></a>' +
     '  <a class="quick-link-card" href="#/letter-hunt"><span class="icon">🔍</span><div class="title">Tìm chữ cái</div><div class="desc">Bấm đúng hết chữ giống nhau</div></a>' +
+    '  <a class="quick-link-card" href="#/case-match"><span class="icon">🔤</span><div class="title">Nối chữ hoa - thường</div><div class="desc">a nối với A, b nối với B...</div></a>' +
     '  <a class="quick-link-card" href="#/tones"><span class="icon">🎵</span><div class="title">Dấu thanh</div><div class="desc">Học và đoán 5 dấu thanh</div></a>' +
     '  <a class="quick-link-card" href="#/topics"><span class="icon">📚</span><div class="title">Từ vựng</div><div class="desc">Nhiều chủ đề thú vị</div></a>' +
     '  <a class="quick-link-card" href="#/progress"><span class="icon">🏆</span><div class="title">Thành tích</div><div class="desc">Xem sao và huy hiệu của bé</div></a>' +
@@ -356,7 +358,10 @@ function renderAlphabet() {
     '<span class="section-badge">📖 Tập đọc</span>' +
     '<h1 class="page-title">Bảng chữ cái tiếng Việt 🔤</h1>' +
     '<p class="page-subtitle">Chạm vào từng chữ để nghe cách đọc nhé!</p>' +
-    '<div style="text-align:center; margin-bottom:20px;"><a class="btn btn-primary" href="#/letter-hunt">🔍 Chơi tìm chữ cái</a></div>' +
+    '<div style="text-align:center; margin-bottom:20px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">' +
+    '  <a class="btn btn-primary" href="#/letter-hunt">🔍 Chơi tìm chữ cái</a>' +
+    '  <a class="btn" style="background:var(--accent2); color:#fff;" href="#/case-match">🔤 Nối chữ hoa - thường</a>' +
+    '</div>' +
     '<div id="alphabet-grid" class="alphabet-grid"></div>';
 
   const grid = document.getElementById("alphabet-grid");
@@ -916,6 +921,151 @@ function renderTonesQuiz() {
   }
 
   document.getElementById("tone-hint-btn").addEventListener("click", () => VietKidSpeech.speakVi(order[qIndex].char));
+  document.getElementById("retry-btn").addEventListener("click", startGame);
+  startGame();
+}
+
+/* ==========================================================================
+   3c. NỐI CHỮ HOA - CHỮ THƯỜNG
+   ========================================================================== */
+const CASE_MATCH_SIZE = 8;
+
+function renderCaseMatchGame() {
+  if (!requireProfile()) return;
+
+  app.innerHTML =
+    '<span class="section-badge accent2">🔤 Nối chữ</span>' +
+    '<h1 class="page-title">🔤 Nối chữ hoa - chữ thường</h1>' +
+    '<p class="page-subtitle">Bấm 1 chữ thường rồi bấm đúng chữ HOA tương ứng nhé!</p>' +
+    '<div class="game-header">' +
+    '  <div id="case-stats"></div>' +
+    '  <a class="btn btn-outline" href="#/alphabet">⬅️ Quay lại</a>' +
+    '</div>' +
+    '<div class="case-match-wrap">' +
+    '  <div class="case-match-col" id="lower-col"></div>' +
+    '  <div class="case-match-col" id="upper-col"></div>' +
+    '</div>' +
+    '<div id="result-modal" class="modal-overlay" style="display:none;">' +
+    '  <div class="modal-box">' +
+    '    <div class="big-emoji" id="modal-emoji">🔤</div>' +
+    '    <h2 id="modal-title">Xong rồi!</h2>' +
+    '    <div class="stars-earned" id="stars-earned"></div>' +
+    '    <div class="score-text" id="score-text"></div>' +
+    '    <div class="modal-actions">' +
+    '      <button class="btn btn-primary" id="retry-btn">🔄 Chơi lại</button>' +
+    '      <a class="btn btn-outline" href="#/alphabet">🔤 Bảng chữ cái</a>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+
+  const basePool = content.alphabet.filter((a) => a.type !== "digraph").map((a) => a.letter);
+  let letters, matchedCount, wrongCount, selected;
+
+  function updateStats() {
+    document.getElementById("case-stats").innerHTML =
+      '<div class="game-stat">🔗 Ghép đúng: ' + matchedCount + ' / ' + letters.length + '</div>' +
+      '<div class="game-stat" style="margin-left:8px;">❌ Bấm sai: ' + wrongCount + '</div>';
+  }
+
+  function renderColumns() {
+    const lowerCol = document.getElementById("lower-col");
+    const upperCol = document.getElementById("upper-col");
+    lowerCol.innerHTML = "";
+    upperCol.innerHTML = "";
+    shuffle(letters).forEach((l) => {
+      const btn = document.createElement("button");
+      btn.className = "case-tile";
+      btn.textContent = l;
+      btn.addEventListener("click", () => onTileClick(btn, l, "lower"));
+      lowerCol.appendChild(btn);
+    });
+    shuffle(letters).forEach((l) => {
+      const btn = document.createElement("button");
+      btn.className = "case-tile";
+      btn.textContent = l.toUpperCase();
+      btn.addEventListener("click", () => onTileClick(btn, l, "upper"));
+      upperCol.appendChild(btn);
+    });
+  }
+
+  function onTileClick(btn, letter, col) {
+    if (btn.classList.contains("matched")) return;
+
+    if (!selected) {
+      selected = { btn, letter, col };
+      btn.classList.add("selected");
+      VietKidSound.playClick();
+      return;
+    }
+
+    if (selected.col === col) {
+      selected.btn.classList.remove("selected");
+      if (selected.btn === btn) {
+        selected = null;
+        return;
+      }
+      selected = { btn, letter, col };
+      btn.classList.add("selected");
+      VietKidSound.playClick();
+      return;
+    }
+
+    const isCorrect = selected.letter === letter;
+    if (isCorrect) {
+      selected.btn.classList.remove("selected");
+      selected.btn.classList.add("matched");
+      btn.classList.add("matched");
+      matchedCount++;
+      updateStats();
+      VietKidSound.playCorrect();
+      selected = null;
+      if (matchedCount === letters.length) setTimeout(finishGame, 400);
+    } else {
+      wrongCount++;
+      updateStats();
+      VietKidSound.playWrong();
+      const wrongA = selected.btn, wrongB = btn;
+      wrongA.classList.add("wrong");
+      wrongB.classList.add("wrong");
+      setTimeout(() => {
+        wrongA.classList.remove("selected", "wrong");
+        wrongB.classList.remove("wrong");
+      }, 500);
+      selected = null;
+    }
+  }
+
+  async function finishGame() {
+    let stars;
+    if (wrongCount === 0) stars = 3;
+    else if (wrongCount <= 3) stars = 2;
+    else stars = 1;
+    const score = Math.round((letters.length / (letters.length + wrongCount)) * 100);
+
+    const msg = pickResultMessage(stars);
+    document.getElementById("modal-emoji").textContent = msg.emoji;
+    document.getElementById("modal-title").textContent = msg.title;
+    document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+    document.getElementById("score-text").textContent = "Ghép đúng " + letters.length + "/" + letters.length + " cặp, bấm sai " + wrongCount + " lần!";
+    document.getElementById("result-modal").style.display = "flex";
+    VietKidSound.playCheer();
+    VietKidSound.confettiBurst();
+
+    const profileId = Store.getCurrentProfileId(currentUser.uid);
+    if (profileId) await Store.saveCaseMatchProgress(currentUser.uid, profileId, score, stars);
+    await renderHeader();
+  }
+
+  function startGame() {
+    letters = shuffle(basePool).slice(0, CASE_MATCH_SIZE);
+    matchedCount = 0;
+    wrongCount = 0;
+    selected = null;
+    document.getElementById("result-modal").style.display = "none";
+    updateStats();
+    renderColumns();
+  }
+
   document.getElementById("retry-btn").addEventListener("click", startGame);
   startGame();
 }
