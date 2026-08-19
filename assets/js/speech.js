@@ -69,10 +69,15 @@ function isGoogleVoice(v) {
   return /google/i.test(v.name) || /google/i.test(v.voiceURI || "");
 }
 
+function normLang(l) {
+  return (l || "").toLowerCase().replace("_", "-");
+}
+
 function pickVoice(lang) {
-  const prefix = lang.split("-")[0];
-  const matchesLang = (v) => v.lang === lang;
-  const matchesPrefix = (v) => v.lang && v.lang.startsWith(prefix);
+  const target = normLang(lang);
+  const prefix = target.split("-")[0];
+  const matchesLang = (v) => normLang(v.lang) === target;
+  const matchesPrefix = (v) => normLang(v.lang).startsWith(prefix);
 
   return (
     voices.find((v) => matchesLang(v) && isGoogleVoice(v)) ||
@@ -85,20 +90,16 @@ function pickVoice(lang) {
 
 function speakViaBrowserVoice(text, lang) {
   if (!("speechSynthesis" in window) || !text) return;
-  const voice = pickVoice(lang);
-  if (!voice) {
-    // Máy này không có giọng nào khớp ngôn ngữ (VD: không cài giọng
-    // tiếng Việt) — thà im lặng còn hơn để trình duyệt tự ý thay bằng
-    // giọng ngôn ngữ khác (VD: đọc tiếng Việt bằng giọng tiếng Nhật),
-    // gây sai lệch phát âm cho bé.
-    return;
-  }
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = lang;
   utter.rate = 0.82;
   utter.pitch = 1.15;
-  utter.voice = voice;
+  // Nếu máy không có giọng khớp đúng ngôn ngữ, vẫn đọc bằng giọng gần
+  // nhất trình duyệt tự chọn (có thể lệch giọng) — bé vẫn nghe được âm
+  // thanh khi bấm nút, còn hơn im lặng hoàn toàn.
+  const voice = pickVoice(lang);
+  if (voice) utter.voice = voice;
   window.speechSynthesis.speak(utter);
 }
 
