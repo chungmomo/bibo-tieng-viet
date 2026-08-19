@@ -1,6 +1,6 @@
 /* Lưu trữ hồ sơ bé + tiến trình học bằng Firestore (thay cho SQLite).
    Cấu trúc dữ liệu:
-     users/{uid}/profiles/{profileId}                          {name, avatar, createdAt, toneQuiz?}
+     users/{uid}/profiles/{profileId}                          {name, avatar, createdAt, toneQuiz?, caseMatch?}
      users/{uid}/profiles/{profileId}/progress/{topicId_gameType}       {topicId, gameType, score, stars, updatedAt}
      users/{uid}/profiles/{profileId}/writingProgress/{letterIndex}     {letterIndex, score, stars, updatedAt}
      users/{uid}/profiles/{profileId}/letterHuntProgress/{letterIndex} {letterIndex, score, stars, updatedAt}
@@ -131,6 +131,18 @@ export async function saveToneProgress(uid, profileId, score, stars) {
   return computeSummary(uid, profileId);
 }
 
+export async function saveCaseMatchProgress(uid, profileId, score, stars) {
+  stars = Math.max(0, Math.min(MAX_STARS_PER_GAME, Math.round(stars)));
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const ref = profileDoc(uid, profileId);
+  const existing = await getDoc(ref);
+  const prev = existing.exists() ? existing.data().caseMatch : null;
+  const bestScore = prev ? Math.max(prev.score, score) : score;
+  const bestStars = prev ? Math.max(prev.stars, stars) : stars;
+  await setDoc(ref, { caseMatch: { score: bestScore, stars: bestStars, updatedAt: serverTimestamp() } }, { merge: true });
+  return computeSummary(uid, profileId);
+}
+
 export async function computeSummary(uid, profileId) {
   const { alphabet, vocabulary } = await getContent();
   const [progressSnap, writingSnap, huntSnap, profileSnap] = await Promise.all([
@@ -208,7 +220,13 @@ export async function computeSummary(uid, profileId) {
     badges.push({ id: "tone_master", icon: "🎵", label: "Bậc thầy dấu thanh" });
   }
 
-  const totalStars = vocabStars + writingStars + huntStars + toneStars;
+  const caseMatch = profileSnap.exists() ? profileSnap.data().caseMatch : null;
+  const caseMatchStars = caseMatch ? caseMatch.stars : 0;
+  if (caseMatch && caseMatch.stars >= 3) {
+    badges.push({ id: "case_master", icon: "🔤", label: "Bậc thầy chữ hoa" });
+  }
+
+  const totalStars = vocabStars + writingStars + huntStars + toneStars + caseMatchStars;
   MILESTONE_BADGES.forEach(([threshold, icon, label]) => {
     if (totalStars >= threshold) badges.push({ id: "milestone_" + threshold, icon, label });
   });
@@ -233,6 +251,11 @@ export async function computeSummary(uid, profileId) {
     tones: {
       score: toneQuiz ? toneQuiz.score : 0,
       stars: toneStars,
+      max_stars: MAX_STARS_PER_GAME,
+    },
+    caseMatch: {
+      score: caseMatch ? caseMatch.score : 0,
+      stars: caseMatchStars,
       max_stars: MAX_STARS_PER_GAME,
     },
     badges,

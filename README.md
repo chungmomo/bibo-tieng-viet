@@ -44,10 +44,14 @@ VietKid/
 │       ├── speech.js            # Phát âm (Web Speech API)
 │       └── sound.js             # Âm thanh + hiệu ứng confetti
 ├── data/
-│   ├── alphabet.json           # 29 chữ cái tiếng Việt
-│   └── vocabulary.json         # 11 chủ đề từ vựng song ngữ Việt-Nhật
+│   ├── alphabet.json           # 29 chữ đơn + 11 chữ ghép (ch, nh, ngh...)
+│   ├── vocabulary.json         # 14 chủ đề từ vựng song ngữ Việt-Nhật
+│   └── tones.json              # 5 dấu thanh (huyền/sắc/hỏi/ngã/nặng)
 └── firestore.rules             # Quy tắc bảo mật Firestore (dán vào Console)
 ```
+
+> `Giai đoạn 1/` (nếu có trong thư mục dự án) là tài liệu PDF tham khảo
+> dùng để soạn nội dung — không commit vào git (xem `.gitignore`).
 
 ## Thiết lập Firebase (chỉ cần làm 1 lần)
 
@@ -119,9 +123,14 @@ Muốn thêm avatar cho hồ sơ bé? Sửa mảng `AVATARS` ở đầu file
 
 - **Đăng nhập phụ huynh** (tên đăng nhập tùy ý + mật khẩu, không cần
   email) + nhiều hồ sơ bé/gia đình, đồng bộ qua Firestore trên mọi thiết bị.
-- **Bảng chữ cái tiếng Việt**: 29 chữ cái, lật thẻ xem ví dụ + nghe phát âm.
+- **Bảng chữ cái tiếng Việt**: 29 chữ đơn + 11 chữ ghép (ch, gh, gi, kh,
+  ng, ngh, nh, ph, qu, th, tr) — lật thẻ xem ví dụ + nghe phát âm.
 - **🔍 Tìm chữ cái**: bấm chọn hết các ô chứa đúng chữ cái mục tiêu giữa
   các chữ dễ nhầm lẫn (a/ă/â, o/ô/ơ...) — luyện nhận diện mặt chữ.
+- **🔤 Nối chữ hoa - chữ thường**: ghép a-A, b-B... luyện nhận biết chữ
+  in hoa tương ứng với chữ thường đã học.
+- **🎵 Dấu thanh**: học 5 dấu thanh (huyền/sắc/hỏi/ngã/nặng) qua ví dụ có
+  âm thanh, rồi chơi đoán dấu với các âm tiết ghép ngẫu nhiên.
 - **✍️ Tập viết chữ**: tô theo hình chữ mờ trên canvas, tự động chấm điểm
   theo độ phủ và cho sao.
 - **Từ vựng theo 14 chủ đề**: Gia đình, Con vật, Màu sắc, Số đếm, Đồ ăn,
