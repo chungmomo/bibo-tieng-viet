@@ -106,6 +106,8 @@ async function route() {
   if (parts[0] === "letter-hunt" && parts.length === 2) return renderLetterHuntGame(parts[1]);
   if (parts[0] === "writing" && parts.length === 1) return renderWritingList();
   if (parts[0] === "writing" && parts.length === 2) return renderWritingPractice(parts[1]);
+  if (parts[0] === "tones" && parts.length === 1) return renderTonesIntro();
+  if (parts[0] === "tones" && parts.length === 2 && parts[1] === "quiz") return renderTonesQuiz();
   if (parts[0] === "topics" && parts.length === 1) return renderTopics();
   if (parts[0] === "topics" && parts.length === 2) return renderVocabulary(parts[1]);
   if (parts[0] === "games" && parts.length === 3) return renderGame(parts[1], parts[2]);
@@ -320,10 +322,11 @@ function renderDashboard(profile) {
     '  <div class="stars-total">⭐ ' + profile.total_stars + ' sao</div>' +
     '</div>' +
     '<div class="quick-links">' +
-    '  <a class="quick-link-card" href="#/alphabet"><span class="icon">🔤</span><div class="title">Bảng chữ cái</div><div class="desc">Học 29 chữ cái tiếng Việt</div></a>' +
+    '  <a class="quick-link-card" href="#/alphabet"><span class="icon">🔤</span><div class="title">Bảng chữ cái</div><div class="desc">29 chữ đơn + 11 chữ ghép</div></a>' +
     '  <a class="quick-link-card" href="#/writing"><span class="icon">✍️</span><div class="title">Tập viết</div><div class="desc">Tô theo hình chữ mờ</div></a>' +
-    '  <a class="quick-link-card" href="#/topics"><span class="icon">📚</span><div class="title">Từ vựng</div><div class="desc">Nhiều chủ đề thú vị</div></a>' +
     '  <a class="quick-link-card" href="#/letter-hunt"><span class="icon">🔍</span><div class="title">Tìm chữ cái</div><div class="desc">Bấm đúng hết chữ giống nhau</div></a>' +
+    '  <a class="quick-link-card" href="#/tones"><span class="icon">🎵</span><div class="title">Dấu thanh</div><div class="desc">Học và đoán 5 dấu thanh</div></a>' +
+    '  <a class="quick-link-card" href="#/topics"><span class="icon">📚</span><div class="title">Từ vựng</div><div class="desc">Nhiều chủ đề thú vị</div></a>' +
     '  <a class="quick-link-card" href="#/progress"><span class="icon">🏆</span><div class="title">Thành tích</div><div class="desc">Xem sao và huy hiệu của bé</div></a>' +
     '</div>' +
     '<div style="text-align:center;"><button class="btn btn-outline" id="switch-profile-btn">🔄 Đổi hồ sơ khác</button></div>' +
@@ -360,9 +363,10 @@ function renderAlphabet() {
   content.alphabet.forEach((item) => {
     const card = document.createElement("div");
     card.className = "letter-card";
+    const frontFontSize = { 1: "3rem", 2: "1.9rem" }[item.letter.length] || "1.5rem";
     card.innerHTML =
       '<div class="letter-card-inner">' +
-      '  <div class="letter-face letter-front">' + item.letter + '</div>' +
+      '  <div class="letter-face letter-front" style="font-size:' + frontFontSize + ';">' + item.letter + '</div>' +
       '  <div class="letter-face letter-back">' +
       '    <div class="emoji">' + item.emoji + '</div>' +
       '    <div class="word">' + item.word + '</div>' +
@@ -481,6 +485,7 @@ async function renderLetterHuntGame(idxParam) {
     cells.forEach((ch) => {
       const btn = document.createElement("button");
       btn.className = "hunt-tile";
+      if (ch.length > 1) btn.style.fontSize = ch.length === 2 ? "1.15rem" : "0.95rem";
       btn.textContent = ch;
       btn.addEventListener("click", () => onTileClick(btn, ch));
       gridEl.appendChild(btn);
@@ -627,7 +632,9 @@ async function renderWritingPractice(idxParam) {
   function drawGuide() {
     guideCtx.clearRect(0, 0, DISPLAY_SIZE, DISPLAY_SIZE);
     guideCtx.fillStyle = "rgba(242, 136, 75, 0.32)";
-    guideCtx.font = "700 " + Math.floor(DISPLAY_SIZE * 0.7) + "px 'Baloo 2', sans-serif";
+    // Chữ ghép (ch, ngh...) dài hơn 1 ký tự cần cỡ chữ nhỏ hơn để vừa canvas
+    const scaleByLength = { 1: 0.7, 2: 0.42, 3: 0.3 }[letter.letter.length] || 0.3;
+    guideCtx.font = "700 " + Math.floor(DISPLAY_SIZE * scaleByLength) + "px 'Baloo 2', sans-serif";
     guideCtx.textAlign = "center";
     guideCtx.textBaseline = "middle";
     guideCtx.fillText(letter.letter, DISPLAY_SIZE / 2, DISPLAY_SIZE / 2 + DISPLAY_SIZE * 0.05);
@@ -752,6 +759,165 @@ async function renderWritingPractice(idxParam) {
   });
 
   await updateStarsStat();
+}
+
+/* ==========================================================================
+   3b. DẤU THANH (5 dấu thanh tiếng Việt + trò chơi đoán dấu)
+   ========================================================================== */
+function renderTonesIntro() {
+  app.innerHTML =
+    '<span class="section-badge accent2">🎵 Dấu thanh</span>' +
+    '<h1 class="page-title">5 dấu thanh tiếng Việt 🎵</h1>' +
+    '<p class="page-subtitle">Chạm vào từng dấu để nghe ví dụ, rồi thử chơi đoán dấu nhé!</p>' +
+    '<div class="tone-grid" id="tone-grid"></div>' +
+    '<div style="text-align:center; margin-top:24px;"><a class="btn btn-primary btn-lg" href="#/tones/quiz">🎯 Chơi đoán dấu thanh</a></div>';
+
+  const grid = document.getElementById("tone-grid");
+  content.tones.forEach((t) => {
+    const card = document.createElement("div");
+    card.className = "tone-card";
+    card.innerHTML =
+      '<div class="tone-symbol">' + t.symbol + '</div>' +
+      '<div class="tone-name">' + t.name + '</div>' +
+      '<div class="tone-example"><span class="emoji">' + t.emoji + '</span><span>' + t.word + '</span></div>' +
+      '<div class="tone-hint">' + t.hint + '</div>';
+    card.addEventListener("click", () => {
+      VietKidSound.playClick();
+      VietKidSpeech.speakVi(t.word);
+    });
+    grid.appendChild(card);
+  });
+}
+
+const TONE_VOWELS = ["a", "ă", "â", "e", "ê", "i", "o", "ô", "ơ", "u", "ư", "y"];
+
+function combineTone(vowel, mark) {
+  return (vowel + mark).normalize("NFC");
+}
+
+function renderTonesQuiz() {
+  if (!requireProfile()) return;
+
+  app.innerHTML =
+    '<span class="section-badge accent2">🎵 Dấu thanh</span>' +
+    '<h1 class="page-title">🎯 Đoán dấu thanh</h1>' +
+    '<p class="page-subtitle">Nghe rồi nhìn chữ, đoán xem đây là dấu gì nhé!</p>' +
+    '<div class="game-header">' +
+    '  <div id="tone-stats"></div>' +
+    '  <a class="btn btn-outline" href="#/tones">⬅️ Quay lại</a>' +
+    '</div>' +
+    '<div class="tone-quiz-prompt">' +
+    '  <div class="tone-quiz-char" id="tone-char"></div><br>' +
+    '  <button class="btn btn-blue" id="tone-hint-btn" style="margin-top:14px;">🔊 Nghe lại</button>' +
+    '</div>' +
+    '<div class="quiz-options" id="tone-options"></div>' +
+    '<div id="result-modal" class="modal-overlay" style="display:none;">' +
+    '  <div class="modal-box">' +
+    '    <div class="big-emoji" id="modal-emoji">🎵</div>' +
+    '    <h2 id="modal-title">Xong rồi!</h2>' +
+    '    <div class="stars-earned" id="stars-earned"></div>' +
+    '    <div class="score-text" id="score-text"></div>' +
+    '    <div class="modal-actions">' +
+    '      <button class="btn btn-primary" id="retry-btn">🔄 Chơi lại</button>' +
+    '      <a class="btn btn-outline" href="#/tones">🎵 Về trang dấu thanh</a>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+
+  const ROUND_COUNT = 10;
+  let order = [], qIndex = 0, correctCount = 0, answered = false;
+
+  function updateStats() {
+    document.getElementById("tone-stats").innerHTML =
+      '<div class="game-stat">📋 Câu: ' + (qIndex + 1) + ' / ' + order.length + '</div>' +
+      '<div class="game-stat" style="margin-left:8px;">✅ Đúng: ' + correctCount + '</div>';
+  }
+
+  function buildRounds() {
+    const rounds = [];
+    for (let i = 0; i < ROUND_COUNT; i++) {
+      const vowel = TONE_VOWELS[Math.floor(Math.random() * TONE_VOWELS.length)];
+      const tone = content.tones[Math.floor(Math.random() * content.tones.length)];
+      rounds.push({ toneId: tone.id, char: combineTone(vowel, tone.mark) });
+    }
+    return rounds;
+  }
+
+  function renderQuestion() {
+    answered = false;
+    const round = order[qIndex];
+    updateStats();
+    document.getElementById("tone-char").textContent = round.char;
+    popEmoji(document.getElementById("tone-char"));
+    VietKidSpeech.speakVi(round.char);
+
+    const optionsEl = document.getElementById("tone-options");
+    optionsEl.innerHTML = "";
+    shuffle(content.tones).forEach((t) => {
+      const btn = document.createElement("button");
+      btn.className = "quiz-option";
+      btn.textContent = t.name;
+      btn.addEventListener("click", () => onAnswer(btn, t.id, round.toneId));
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function onAnswer(btn, chosenId, correctId) {
+    if (answered) return;
+    answered = true;
+    const isCorrect = chosenId === correctId;
+    btn.classList.add(isCorrect ? "correct" : "incorrect");
+    if (isCorrect) {
+      correctCount++;
+      updateStats();
+      VietKidSound.playCorrect();
+    } else {
+      VietKidSound.playWrong();
+      const correctName = content.tones.find((t) => t.id === correctId).name;
+      [...document.getElementById("tone-options").children].forEach((c) => {
+        if (c.textContent === correctName) c.classList.add("correct");
+      });
+    }
+
+    setTimeout(() => {
+      qIndex++;
+      if (qIndex < order.length) renderQuestion();
+      else finishGame();
+    }, 1300);
+  }
+
+  async function finishGame() {
+    const pct = correctCount / order.length;
+    let stars;
+    if (pct >= 0.9) stars = 3;
+    else if (pct >= 0.6) stars = 2;
+    else stars = 1;
+    const score = Math.round(pct * 100);
+
+    const msg = pickResultMessage(stars);
+    document.getElementById("modal-emoji").textContent = msg.emoji;
+    document.getElementById("modal-title").textContent = msg.title;
+    document.getElementById("stars-earned").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+    document.getElementById("score-text").textContent = "Đúng " + correctCount + "/" + order.length + " câu!";
+    document.getElementById("result-modal").style.display = "flex";
+    VietKidSound.playCheer();
+    VietKidSound.confettiBurst();
+
+    const profileId = Store.getCurrentProfileId(currentUser.uid);
+    if (profileId) await Store.saveToneProgress(currentUser.uid, profileId, score, stars);
+    await renderHeader();
+  }
+
+  function startGame() {
+    order = buildRounds();
+    qIndex = 0; correctCount = 0;
+    document.getElementById("result-modal").style.display = "none";
+    renderQuestion();
+  }
+
+  document.getElementById("tone-hint-btn").addEventListener("click", () => VietKidSpeech.speakVi(order[qIndex].char));
+  document.getElementById("retry-btn").addEventListener("click", startGame);
+  startGame();
 }
 
 /* ==========================================================================

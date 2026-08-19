@@ -576,6 +576,44 @@ main {
 }
 
 /* ---------------------------------------------------------------------- */
+/* Dấu thanh (tone marks)                                                 */
+/* ---------------------------------------------------------------------- */
+.tone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.tone-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 20px 14px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.tone-card:hover { transform: translateY(-4px); }
+.tone-symbol { font-size: 2.6rem; font-weight: 800; font-family: 'Baloo 2', sans-serif; color: var(--primary-deep); }
+.tone-name { font-weight: 800; margin-top: 6px; }
+.tone-example { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; font-weight: 700; }
+.tone-example .emoji { font-size: 1.5rem; }
+.tone-hint { color: var(--text-soft); font-size: 0.8rem; margin-top: 8px; }
+
+.tone-quiz-prompt { text-align: center; margin-bottom: 24px; }
+.tone-quiz-char {
+  display: inline-block;
+  font-size: 5rem;
+  font-weight: 800;
+  font-family: 'Baloo 2', sans-serif;
+  color: var(--primary-deep);
+  background: #fff;
+  padding: 16px 40px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+/* ---------------------------------------------------------------------- */
 /* Tập viết chữ (writing practice)                                       */
 /* ---------------------------------------------------------------------- */
 .writing-select-grid {

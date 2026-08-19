@@ -1,0 +1,7 @@
+[
+  {"id": "huyen", "mark": "̀", "name": "Dấu huyền", "symbol": "◌̀", "word": "bà", "ja": "おばあさん", "emoji": "👵", "hint": "Giọng đọc từ từ đi xuống"},
+  {"id": "sac", "mark": "́", "name": "Dấu sắc", "symbol": "◌́", "word": "cá", "ja": "魚", "emoji": "🐟", "hint": "Giọng đọc lên cao, dứt khoát"},
+  {"id": "hoi", "mark": "̉", "name": "Dấu hỏi", "symbol": "◌̉", "word": "thỏ", "ja": "うさぎ", "emoji": "🐰", "hint": "Giọng đọc xuống rồi lên như đang hỏi"},
+  {"id": "nga", "mark": "̃", "name": "Dấu ngã", "symbol": "◌̃", "word": "mũ", "ja": "帽子", "emoji": "🧢", "hint": "Giọng đọc gãy, lên cao đột ngột"},
+  {"id": "nang", "mark": "̣", "name": "Dấu nặng", "symbol": "◌̣", "word": "vịt", "ja": "あひる", "emoji": "🦆", "hint": "Giọng đọc xuống thấp và ngắn, nặng"}
+]

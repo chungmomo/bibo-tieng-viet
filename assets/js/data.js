@@ -7,12 +7,13 @@ export function getContent() {
     cachePromise = Promise.all([
       fetch("./data/alphabet.json").then((r) => r.json()),
       fetch("./data/vocabulary.json").then((r) => r.json()),
-    ]).then(([alphabet, vocabulary]) => {
+      fetch("./data/tones.json").then((r) => r.json()),
+    ]).then(([alphabet, vocabulary, tones]) => {
       const vocabByID = {};
       vocabulary.forEach((topic) => {
         vocabByID[topic.id] = topic;
       });
-      return { alphabet, vocabulary, vocabByID };
+      return { alphabet, vocabulary, vocabByID, tones };
     });
   }
   return cachePromise;
